@@ -1,131 +1,21 @@
-import subprocess
-import re
-import time
+# ...existing code...
 
-def validar_objetivo(objetivo):
-    ip_regex = r"^\d{1,3}(\.\d{1,3}){3}$"
-    dominio_regex = r"^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-    ipv6_regex = r"^([0-9a-fA-F:]+)$"
-    if re.match(ip_regex, objetivo) or re.match(dominio_regex, objetivo) or re.match(ipv6_regex, objetivo):
-        return True
-    return False
+def escaneo_nmap_msf(target, extra=""):
+    xml_file = "nmap_result.xml"
+    comando_nmap = [
+        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oX", xml_file
+    ]
+    if extra:
+        comando_nmap += extra.split()
+    ejecutar_comando(comando_nmap)
 
-def ejecutar_comando(comando):
-    print(f"\nEjecutando: {' '.join(comando)}")
-    inicio = time.time()
+    print("\nImportando resultados en Metasploit...")
+    comando_msf = f"msfconsole -q -x 'db_import {xml_file}; hosts; services; exit'"
     try:
-        subprocess.run(comando, check=True)
-        print(f"Escaneo completado en {round(time.time() - inicio, 2)} segundos.")
+        subprocess.run(comando_msf, shell=True, check=True)
+        print("Importación a Metasploit completada.")
     except subprocess.CalledProcessError as e:
-        print(f"Error al ejecutar Nmap: {e}")
-    except FileNotFoundError:
-        print("Nmap no está instalado o no se encuentra en el PATH.")
-
-def escaneo_basico(target, min_rate, extra=""):
-    comando = [
-        "nmap", "-p-", "--open", "--min-rate", str(min_rate),
-        "-Pn", "-n", "-vvv", target, "-oN", "nmap_result.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_servicios(target, extra=""):
-    comando = [
-        "nmap", "-sV", "-Pn", "-n", "-vvv", target, "-oN", "nmap_servicios.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_os(target, extra=""):
-    comando = [
-        "nmap", "-O", "-Pn", "-n", "-vvv", target, "-oN", "nmap_os.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_xml(target, extra=""):
-    comando = [
-        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oX", "nmap_result.xml"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_json(target, extra=""):
-    comando = [
-        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oJ", "nmap_result.json"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_servicios_C(target, extra=""):
-    comando = [
-        "nmap", "-sV", "-C", "-Pn", "-n", "-vvv", target, "-oN", "nmap_svC.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_agresivo(target, extra=""):
-    comando = [
-        "nmap", "-A", "-Pn", "-n", "-vvv", target, "-oN", "nmap_agresivo.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_syn(target, extra=""):
-    comando = [
-        "nmap", "-sS", "-Pn", "-n", "-vvv", target, "-oN", "nmap_syn.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_sigiloso(target, nivel, extra=""):
-    comando = [
-        "nmap", "-sS", "-T" + str(nivel), "-Pn", "-n", "-vvv", target, "-oN", f"nmap_sigiloso_T{nivel}.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_ipv6(target, extra=""):
-    comando = [
-        "nmap", "-6", "-Pn", "-n", "-vvv", target, "-oN", "nmap_ipv6.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_nse_vuln(target, extra=""):
-    comando = [
-        "nmap", "--script", "vuln", "-Pn", "-n", "-vvv", target, "-oN", "nmap_vuln.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def escaneo_arp(target, extra=""):
-    comando = [
-        "nmap", "-PR", "-n", "-vvv", target, "-oN", "nmap_arp.txt"
-    ]
-    if extra:
-        comando += extra.split()
-    ejecutar_comando(comando)
-
-def ayuda_android():
-    print("""
-Para usar Nmap en Android (Termux):
-1. Instala Termux desde Google Play o F-Droid.
-2. Instala Nmap con: pkg install nmap
-3. Ejecuta los mismos comandos que en Linux.
-Ejemplo: nmap -sV 192.168.1.1
-""")
+        print(f"Error al importar en Metasploit: {e}")
 
 def mostrar_ayuda():
     print("""
@@ -143,8 +33,11 @@ Opciones de escaneo:
 11. Escaneo de vulnerabilidades con NSE (--script vuln)
 12. Escaneo ARP para MACs (-PR)
 13. Ayuda para Nmap en Android
+14. Escaneo Nmap y carga en Metasploit (db_import)
 h. Mostrar esta ayuda
 """)
+
+# ...existing code...
 
 if __name__ == "__main__":
     objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
@@ -153,7 +46,7 @@ if __name__ == "__main__":
         exit(1)
 
     mostrar_ayuda()
-    opcion = input("Elige una opción (1-13, h para ayuda): ")
+    opcion = input("Elige una opción (1-14, h para ayuda): ")
     extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
 
     if opcion == "1":
@@ -190,6 +83,8 @@ if __name__ == "__main__":
         escaneo_arp(objetivo, extra)
     elif opcion == "13":
         ayuda_android()
+    elif opcion == "14":
+        escaneo_nmap_msf(objetivo, extra)
     elif opcion.lower() == "h":
         mostrar_ayuda()
     else:
