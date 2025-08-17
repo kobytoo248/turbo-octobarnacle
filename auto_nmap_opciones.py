@@ -110,6 +110,23 @@ def escaneo_nse_vuln(target, extra=""):
         comando += extra.split()
     ejecutar_comando(comando)
 
+def escaneo_arp(target, extra=""):
+    comando = [
+        "nmap", "-PR", "-n", "-vvv", target, "-oN", "nmap_arp.txt"
+    ]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+
+def ayuda_android():
+    print("""
+Para usar Nmap en Android (Termux):
+1. Instala Termux desde Google Play o F-Droid.
+2. Instala Nmap con: pkg install nmap
+3. Ejecuta los mismos comandos que en Linux.
+Ejemplo: nmap -sV 192.168.1.1
+""")
+
 def mostrar_ayuda():
     print("""
 Opciones de escaneo:
@@ -124,6 +141,8 @@ Opciones de escaneo:
 9. Escaneos sigilosos con T1, T2, T3, T4
 10. Escaneo IPv6
 11. Escaneo de vulnerabilidades con NSE (--script vuln)
+12. Escaneo ARP para MACs (-PR)
+13. Ayuda para Nmap en Android
 h. Mostrar esta ayuda
 """)
 
@@ -134,7 +153,7 @@ if __name__ == "__main__":
         exit(1)
 
     mostrar_ayuda()
-    opcion = input("Elige una opción (1-11, h para ayuda): ")
+    opcion = input("Elige una opción (1-13, h para ayuda): ")
     extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
 
     if opcion == "1":
@@ -167,6 +186,10 @@ if __name__ == "__main__":
         escaneo_ipv6(objetivo, extra)
     elif opcion == "11":
         escaneo_nse_vuln(objetivo, extra)
+    elif opcion == "12":
+        escaneo_arp(objetivo, extra)
+    elif opcion == "13":
+        ayuda_android()
     elif opcion.lower() == "h":
         mostrar_ayuda()
     else:
