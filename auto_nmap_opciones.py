@@ -153,6 +153,15 @@ def escaneo_hydra(target, servicio, usuario, diccionario, hilos):
     ]
     ejecutar_comando(comando)
 
+
+def escaneo_gobuster(target, wordlist, ext, threads):
+    comando = [
+        "gobuster", "dir", "-u", target, "-w", wordlist, "-t", str(threads)
+    ]
+    if ext:
+        comando += ["-x", ext]
+    ejecutar_comando(comando)
+    
 def mostrar_ayuda():
     print("""
 Opciones de escaneo:
@@ -172,9 +181,9 @@ Opciones de escaneo:
 14. Escaneo Nmap y carga en Metasploit (db_import)
 15. Escaneo de directorios con Dirsearch
 16. Fuerza bruta con Hydra (FTP, SSH, MySQL)
+17. Escaneo de directorios y archivos con Gobuster
 h. Mostrar esta ayuda
 """)
-
 if __name__ == "__main__":
     usar_proxychains = input("¿Quieres usar proxychains y Tor para el escaneo? (s/n): ").lower() == "s"
     objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
@@ -183,7 +192,7 @@ if __name__ == "__main__":
         exit(1)
 
     mostrar_ayuda()
-    opcion = input("Elige una opción (1-16, h para ayuda): ")
+    opcion = input("Elige una opción (1-17, h para ayuda): ")
     extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
     if extra.lower() in ["si", "no"]:
         extra = ""
@@ -227,16 +236,20 @@ if __name__ == "__main__":
     elif opcion == "15":
         escaneo_dirsearch(objetivo, extra)
     elif opcion == "16":
-        servicio = input("Servicio a atacar (ftp, ssh, mysql): ")
-        if servicio not in ["ftp", "ssh", "mysql"]:
-            print("Servicio no soportado.")
-            exit(1)
+        servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ")
         usuario = input("Usuario objetivo: ")
         diccionario = input("Ruta al diccionario de contraseñas: ")
         hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
         if not hilos.isdigit() or int(hilos) < 1:
             hilos = "4"
         escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
+    elif opcion == "17":
+        wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+        ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
+        threads = input("Número de hilos (ejemplo: 10, 20): ")
+        if not threads.isdigit() or int(threads) < 1:
+            threads = "10"
+        escaneo_gobuster(objetivo, wordlist, ext, threads)
     elif opcion.lower() == "h":
         mostrar_ayuda()
     else:
