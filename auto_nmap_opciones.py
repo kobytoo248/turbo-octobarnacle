@@ -11,6 +11,7 @@ def validar_objetivo(objetivo):
     return False
 
 def ejecutar_comando(comando):
+    global usar_proxychains
     if usar_proxychains:
         comando = ["proxychains"] + comando
     print(f"\nEjecutando: {' '.join(comando)}")
@@ -120,6 +121,16 @@ def escaneo_arp(target, extra=""):
         comando += extra.split()
     ejecutar_comando(comando)
 
+
+
+
+
+def escaneo_nmap_msf(target, extra=""):
+    print("Función escaneo_nmap_msf aún no implementada.")
+
+# Elimina la función escaneo_arp duplicada y deja solo una versión.
+# Elimina el segundo print en ayuda_android y deja solo uno.
+
 def ayuda_android():
     print("""
 Para usar Nmap en Android (Termux):
@@ -129,22 +140,18 @@ Para usar Nmap en Android (Termux):
 Ejemplo: nmap -sV 192.168.1.1
 """)
 
-def escaneo_nmap_msf(target, extra=""):
-    xml_file = "nmap_result.xml"
-    comando_nmap = [
-        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oX", xml_file
-    ]
-    if extra:
-        comando_nmap += extra.split()
-    ejecutar_comando(comando_nmap)
 
-    print("\nImportando resultados en Metasploit...")
-    comando_msf = f"msfconsole -q -x 'db_import {xml_file}; hosts; services; exit'"
-    try:
-        subprocess.run(comando_msf, shell=True, check=True)
-        print("Importación a Metasploit completada.")
-    except subprocess.CalledProcessError as e:
-        print(f"Error al importar en Metasploit: {e}")
+def escaneo_dirsearch(target, extra=""):
+    comando = ["dirsearch", "-u", target]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+
+def escaneo_hydra(target, servicio, usuario, diccionario, hilos):
+    comando = [
+        "hydra", "-l", usuario, "-P", diccionario, "-t", str(hilos), target, servicio
+    ]
+    ejecutar_comando(comando)
 
 def mostrar_ayuda():
     print("""
@@ -163,6 +170,8 @@ Opciones de escaneo:
 12. Escaneo ARP para MACs (-PR)
 13. Ayuda para Nmap en Android
 14. Escaneo Nmap y carga en Metasploit (db_import)
+15. Escaneo de directorios con Dirsearch
+16. Fuerza bruta con Hydra (FTP, SSH, MySQL)
 h. Mostrar esta ayuda
 """)
 
@@ -174,7 +183,7 @@ if __name__ == "__main__":
         exit(1)
 
     mostrar_ayuda()
-    opcion = input("Elige una opción (1-14, h para ayuda): ")
+    opcion = input("Elige una opción (1-16, h para ayuda): ")
     extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
     if extra.lower() in ["si", "no"]:
         extra = ""
@@ -215,6 +224,19 @@ if __name__ == "__main__":
         ayuda_android()
     elif opcion == "14":
         escaneo_nmap_msf(objetivo, extra)
+    elif opcion == "15":
+        escaneo_dirsearch(objetivo, extra)
+    elif opcion == "16":
+        servicio = input("Servicio a atacar (ftp, ssh, mysql): ")
+        if servicio not in ["ftp", "ssh", "mysql"]:
+            print("Servicio no soportado.")
+            exit(1)
+        usuario = input("Usuario objetivo: ")
+        diccionario = input("Ruta al diccionario de contraseñas: ")
+        hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
+        if not hilos.isdigit() or int(hilos) < 1:
+            hilos = "4"
+        escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
     elif opcion.lower() == "h":
         mostrar_ayuda()
     else:
