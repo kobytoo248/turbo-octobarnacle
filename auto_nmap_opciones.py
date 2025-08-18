@@ -161,7 +161,11 @@ def escaneo_gobuster(target, wordlist, ext, threads):
     if ext:
         comando += ["-x", ext]
     ejecutar_comando(comando)
-    
+
+def escaneo_nessus(target):
+    print(f"Lanza el escaneo de Nessus manualmente para el objetivo: {target}")
+    print("Puedes automatizar esto usando la API REST de Nessus o el CLI cuando lo configures.")
+
 def mostrar_ayuda():
     print("""
 Opciones de escaneo:
@@ -182,6 +186,7 @@ Opciones de escaneo:
 15. Escaneo de directorios con Dirsearch
 16. Fuerza bruta con Hydra (FTP, SSH, MySQL)
 17. Escaneo de directorios y archivos con Gobuster
+18. Escaneo de vulnerabilidades con Nessus
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
