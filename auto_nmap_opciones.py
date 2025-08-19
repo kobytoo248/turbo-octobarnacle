@@ -239,7 +239,7 @@ Opciones de escaneo:
 17. Escaneo de directorios y archivos con Gobuster
 18. Escaneo de vulnerabilidades con Nessus
 19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
-h.  Mostrar ayuda ()
+h.  Mostrar esta ayuda 
 """)
                     
 if __name__ == "__main__":
