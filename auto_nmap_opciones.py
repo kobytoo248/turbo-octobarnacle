@@ -67,13 +67,13 @@ def escaneo_json(target, extra=""):
 
 def escaneo_servicios_C(target, extra=""):
     comando = [
-        "nmap", "-sV", "-C", "-Pn", "-n", "-vvv", target, "-oN", "nmap_svC.txt"
+        "nmap", "-sV", "--script=default", "-Pn", "-n", "-vvv", target, "-oN", "nmap_svC.txt"
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_agresivo(target, extra=""):
+
     comando = [
         "nmap", "-A", "-Pn", "-n", "-vvv", target, "-oN", "nmap_agresivo.txt"
     ]
@@ -225,7 +225,7 @@ Opciones de escaneo:
 3. Detección de sistema operativo (-O)
 4. Guardar resultado en XML
 5. Guardar resultado en JSON
-6. Escaneo de servicios con -sV -C
+6. Escaneo de servicios con -sV --script=default
 7. Escaneo agresivo (-A)
 8. Escaneo SYN sigiloso (-sS)
 9. Escaneos sigilosos con T1, T2, T3, T4
