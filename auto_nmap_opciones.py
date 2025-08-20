@@ -24,63 +24,173 @@ def ejecutar_comando(comando):
     except FileNotFoundError:
         print("Nmap no está instalado o no se encuentra en el PATH.")
 
-def escaneo_basico(target, min_rate, extra=""):
+def escaneo_basico(target, min_rate, extra="", puertos="", formato="txt"):
+    salida = "nmap_result." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-p-", "--open", "--min-rate", str(min_rate),
-        "-Pn", "-n", "-vvv", target, "-oN", "nmap_result.txt"
+        "nmap", "--open", "--min-rate", str(min_rate),
+        "-Pn", "-n", "-vvv", target, out_flag, salida
+    ]
+    if puertos:
+        comando.insert(1, "-p")
+        comando.insert(2, puertos)
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+
+def escaneo_servicios(target, extra="", formato="txt"):
+    salida = "nmap_servicios." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
+    comando = [
+        "nmap", "-sV", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_servicios(target, extra=""):
+def escaneo_os(target, extra="", formato="txt"):
+    salida = "nmap_os." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-sV", "-Pn", "-n", "-vvv", target, "-oN", "nmap_servicios.txt"
+        "nmap", "-O", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_os(target, extra=""):
+def escaneo_servicios_C(target, extra="", formato="txt"):
+    salida = "nmap_svC." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-O", "-Pn", "-n", "-vvv", target, "-oN", "nmap_os.txt"
+        "nmap", "-sV", "--script=default", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_xml(target, extra=""):
+def escaneo_agresivo(target, extra="", formato="txt"):
+    salida = "nmap_agresivo." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oX", "nmap_result.xml"
+        "nmap", "-A", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_json(target, extra=""):
+def escaneo_syn(target, extra="", formato="txt"):
+    salida = "nmap_syn." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-p-", "--open", "-Pn", "-n", "-vvv", target, "-oJ", "nmap_result.json"
+        "nmap", "-sS", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-def escaneo_servicios_C(target, extra=""):
+def escaneo_sigiloso(target, nivel, extra="", formato="txt"):
+    salida = f"nmap_sigiloso_T{nivel}." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-sV", "--script=default", "-Pn", "-n", "-vvv", target, "-oN", "nmap_svC.txt"
+        "nmap", "-sS", "-T" + str(nivel), "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
-
+def escaneo_ipv6(target, extra="", formato="txt"):
+    salida = "nmap_ipv6." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
     comando = [
-        "nmap", "-A", "-Pn", "-n", "-vvv", target, "-oN", "nmap_agresivo.txt"
+        "nmap", "-6", "-Pn", "-n", "-vvv", target, out_flag, salida
     ]
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
 
+def escaneo_nse_personalizado(target, script_nse, extra="", formato="txt"):
+    salida = f"nmap_{script_nse}." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
+    comando = [
+        "nmap", "--script", script_nse, "-Pn", "-n", "-vvv", target, out_flag, salida
+    ]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+
+def escaneo_arp(target, extra="", formato="txt"):
+    salida = "nmap_arp." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
+    comando = [
+        "nmap", "-PR", "-n", "-vvv", target, out_flag, salida
+    ]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+def escaneo_udp(target, extra="", formato="txt"):
+    salida = "nmap_udp." + formato
+    if formato == "xml":
+        out_flag = "-oX"
+    elif formato == "json":
+        out_flag = "-oJ"
+    else:
+        out_flag = "-oN"
+    comando = [
+        "nmap", "-sU", "-Pn", "-n", "-vvv", target, out_flag, salida
+    ]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
 def escaneo_syn(target, extra=""):
     comando = [
         "nmap", "-sS", "-Pn", "-n", "-vvv", target, "-oN", "nmap_syn.txt"
@@ -120,7 +230,15 @@ def escaneo_arp(target, extra=""):
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
-
+def mostrar_resumen_servicios(archivo_resultado):
+    print("\nResumen de servicios encontrados:")
+    try:
+        with open(archivo_resultado, "r") as f:
+            for linea in f:
+                if re.match(r"^\d+/tcp\s+open", linea) or re.match(r"^\d+/udp\s+open", linea):
+                    print(linea.strip())
+    except FileNotFoundError:
+        print(f"No se encontró el archivo de resultados: {archivo_resultado}")
 
 
 
@@ -239,9 +357,10 @@ Opciones de escaneo:
 17. Escaneo de directorios y archivos con Gobuster
 18. Escaneo de vulnerabilidades con Nessus
 19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
-h.  Mostrar esta ayuda 
-""")
-                    
+20. Escaneo con script MSE personalizado
+21. Escaneo UDP (-sU)
+h. Mostrar esta ayuda     
+""")      
 if __name__ == "__main__":
     usar_proxychains = input("¿Quieres usar proxychains y Tor para el escaneo? (s/n): ").lower() == "s"
     objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
@@ -255,65 +374,101 @@ if __name__ == "__main__":
     if extra.lower() in ["si", "no"]:
         extra = ""
 
-    if opcion == "1":
-        while True:
-            min_rate = input("Introduce el valor de --min-rate (ejemplo: 200 o 5000): ")
-            if min_rate.isdigit() and int(min_rate) > 0:
-                min_rate = int(min_rate)
-                break
-            else:
-                print("Por favor, introduce un número entero positivo.")
-        escaneo_basico(objetivo, min_rate, extra)
-    elif opcion == "2":
-        escaneo_servicios(objetivo, extra)
-    elif opcion == "3":
-        escaneo_os(objetivo, extra)
-    elif opcion == "4":
-        escaneo_xml(objetivo, extra)
-    elif opcion == "5":
-        escaneo_json(objetivo, extra)
-    elif opcion == "6":
-        escaneo_servicios_C(objetivo, extra)
-    elif opcion == "7":
-        escaneo_agresivo(objetivo, extra)
-    elif opcion == "8":
-        escaneo_syn(objetivo, extra)
-    elif opcion == "9":
-        for nivel in range(1, 5):
-            escaneo_sigiloso(objetivo, nivel, extra)
-    elif opcion == "10":
-        escaneo_ipv6(objetivo, extra)
-    elif opcion == "11":
-        escaneo_nse_vuln(objetivo, extra)
-    elif opcion == "12":
-        escaneo_arp(objetivo, extra)
-    elif opcion == "13":
-        ayuda_android()
-    elif opcion == "14":
-        escaneo_nmap_msf(objetivo, extra)
-    elif opcion == "15":
-        escaneo_dirsearch(objetivo, extra)
-    elif opcion == "16":
-        servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ")
-        usuario = input("Usuario objetivo: ")
-        diccionario = input("Ruta al diccionario de contraseñas: ")
-        hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
-        if not hilos.isdigit() or int(hilos) < 1:
-            hilos = "4"
-        escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
-    elif opcion == "17":
-        wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
-        ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
-        threads = input("Número de hilos (ejemplo: 10, 20): ")
-        if not threads.isdigit() or int(threads) < 1:
-            threads = "10"
-        escaneo_gobuster(objetivo, wordlist, ext, threads)
-    
-    elif opcion == "18":
-        escaneo_nessus(objetivo)
-    elif opcion == "19":
-        generar_payload_msfvenom()
-    elif opcion.lower() == "h":
-        mostrar_ayuda()
-    else:
-        print("Opción no válida.")
+if opcion == "1":
+    # ...tu lógica...
+    escaneo_basico(objetivo, min_rate, extra, puertos, formato)
+    if formato == "txt":
+        mostrar_resumen_servicios("nmap_result.txt")
+elif opcion == "2":
+    escaneo_servicios(objetivo, extra, formato)
+    if formato == "txt":
+        mostrar_resumen_servicios("nmap_servicios.txt")
+elif opcion == "3":
+    escaneo_os(objetivo, extra, formato)
+    if formato == "txt":
+        mostrar_resumen_servicios("nmap_os.txt")
+# ...y así sucesivamente para las demás funciones de Nmap...
+elif opcion == "4":
+    escaneo_xml(objetivo, extra)
+elif opcion == "5":
+    escaneo_json(objetivo, extra)
+elif opcion == "6":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_servicios_C(objetivo, extra, formato)
+elif opcion == "7":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_agresivo(objetivo, extra, formato)
+elif opcion == "8":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_syn(objetivo, extra, formato)
+elif opcion == "9":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    for nivel in range(1, 5):
+        escaneo_sigiloso(objetivo, nivel, extra, formato)
+elif opcion == "10":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_ipv6(objetivo, extra, formato)
+elif opcion == "11":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_nse_vuln(objetivo, extra, formato)
+elif opcion == "12":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_arp(objetivo, extra, formato)
+elif opcion == "13":
+    ayuda_android()
+elif opcion == "14":
+    escaneo_nmap_msf(objetivo, extra)
+elif opcion == "15":
+    escaneo_dirsearch(objetivo, extra)
+elif opcion == "16":
+    servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ")
+    usuario = input("Usuario objetivo: ")
+    diccionario = input("Ruta al diccionario de contraseñas: ")
+    hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
+    if not hilos.isdigit() or int(hilos) < 1:
+        hilos = "4"
+    escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
+elif opcion == "17":
+    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+    ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
+    threads = input("Número de hilos (ejemplo: 10, 20): ")
+    if not threads.isdigit() or int(threads) < 1:
+        threads = "10"
+    escaneo_gobuster(objetivo, wordlist, ext, threads)
+elif opcion == "18":
+    escaneo_nessus(objetivo)
+elif opcion == "19":
+    generar_payload_msfvenom()
+
+elif opcion == "20":
+    script_nse = input("Nombre del script NSE a ejecutar (ejemplo: http-enum, ftp-anon, smb-os-discovery): ")
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_nse_personalizado(objetivo, script_nse, extra, formato)
+
+elif opcion == "21":
+    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
+    if formato not in ["txt", "xml", "json"]:
+        formato = "txt"
+    escaneo_udp(objetivo, extra, formato)
+    if formato == "txt":
+        mostrar_resumen_servicios("nmap_udp.txt")
+elif opcion.lower() == "h":
+    mostrar_ayuda()
+else:
+    print("Opción no válida.")
