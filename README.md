@@ -1,6 +1,6 @@
 # Automatización de Escaneos y Pentesting
 
-Este script permite automatizar escaneos y pruebas de seguridad usando herramientas como Nmap, Dirsearch, Hydra, Gobuster, Nessus y msfvenom.
+Este script permite automatizar escaneos y pruebas de seguridad usando herramientas como Nmap, Dirsearch, Hydra, Gobuster, Nessus, msfvenom, Nikto, WhatWeb, Enum4linux, OpenVAS, Wfuzz y FFUF.
 
 ## Características
 
@@ -10,9 +10,13 @@ Este script permite automatizar escaneos y pruebas de seguridad usando herramien
 - Ejecución de scripts NSE personalizados
 - Fuerza bruta de servicios (FTP, SSH, MySQL, HTTP, SMB, etc.) con Hydra
 - Descubrimiento de directorios y archivos con Dirsearch y Gobuster
-- Escaneo de vulnerabilidades con Nessus (manual o por API/CLI)
+- Escaneo de vulnerabilidades con Nessus y OpenVAS (manual/API/CLI)
 - Generación de payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
 - Soporte para proxychains y Tor
+- Escaneo de vulnerabilidades web con Nikto
+- Detección de tecnologías web con WhatWeb
+- Enumeración de servicios SMB con Enum4linux
+- Fuzzing de directorios y parámetros web con Wfuzz y FFUF
 - Menú interactivo y fácil de usar
 - Resumen automático de servicios encontrados tras cada escaneo
 
@@ -26,6 +30,12 @@ Este script permite automatizar escaneos y pruebas de seguridad usando herramien
 - Nessus (opcional)
 - msfvenom (Metasploit Framework)
 - proxychains (opcional)
+- Nikto
+- WhatWeb
+- Enum4linux
+- OpenVAS (opcional)
+- Wfuzz
+- FFUF
 - Diccionarios de contraseñas y directorios (por ejemplo, rockyou.txt, common.txt)
 
 ## Uso
@@ -62,6 +72,12 @@ Opciones de escaneo:
 19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
 20. Escaneo con script NSE personalizado
 21. Escaneo UDP (-sU)
+22. Escaneo de vulnerabilidades web con Nikto
+23. Detección de tecnologías con WhatWeb
+24. Enumeración de servicios SMB con Enum4linux
+25. Escaneo de vulnerabilidades con OpenVAS
+26. Fuzzing de directorios y parámetros web con Wfuzz
+27. Fuzzing de directorios y archivos web con FFUF
 h. Mostrar esta ayuda
 ```
 
