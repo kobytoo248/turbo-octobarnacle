@@ -1,94 +1,105 @@
-# Automatización de Escaneos y Pentesting
+# Automatizaciones de Pentesting
 
-Este script permite automatizar escaneos y pruebas de seguridad usando herramientas como Nmap, Dirsearch, Hydra, Gobuster, Nessus, msfvenom, Nikto, WhatWeb, Enum4linux, OpenVAS, Wfuzz y FFUF.
+Herramienta en Python para automatizar escaneos y tareas comunes de pentesting usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat y más.
 
 ## Características
 
-- Escaneo de puertos y servicios con Nmap (TCP, UDP, IPv6)
-- Detección de sistema operativo y vulnerabilidades
-- Exportación de resultados en XML, JSON y TXT
-- Ejecución de scripts NSE personalizados
-- Fuerza bruta de servicios (FTP, SSH, MySQL, HTTP, SMB, etc.) con Hydra
-- Descubrimiento de directorios y archivos con Dirsearch y Gobuster
-- Escaneo de vulnerabilidades con Nessus y OpenVAS (manual/API/CLI)
-- Generación de payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
-- Soporte para proxychains y Tor
-- Escaneo de vulnerabilidades web con Nikto
-- Detección de tecnologías web con WhatWeb
-- Enumeración de servicios SMB con Enum4linux
-- Fuzzing de directorios y parámetros web con Wfuzz y FFUF
-- Menú interactivo y fácil de usar
-- Resumen automático de servicios encontrados tras cada escaneo
+- Escaneo de puertos y servicios con Nmap (varios modos y formatos)
+- Detección de vulnerabilidades con scripts NSE y Nikto
+- Fuerza bruta de contraseñas con Hydra
+- Fuzzing de directorios y archivos con Gobuster, FFUF y Wfuzz
+- Generación de payloads con msfvenom
+- Búsqueda de exploits locales con Searchsploit
+- Comandos útiles de Netcat
+- Integración con herramientas como Enum4linux, Dirsearch, Nessus, OpenVAS, WhatWeb, etc.
+- Validación de diccionarios y URLs para evitar errores comunes
 
 ## Requisitos
 
-- Python 3
-- Nmap
-- Dirsearch
-- Hydra
-- Gobuster
-- Nessus (opcional)
-- msfvenom (Metasploit Framework)
-- proxychains (opcional)
-- Nikto
-- WhatWeb
-- Enum4linux
-- OpenVAS (opcional)
-- Wfuzz
-- FFUF
-- Diccionarios de contraseñas y directorios (por ejemplo, rockyou.txt, common.txt)
+- Python 3.x
+- Las herramientas externas instaladas en el sistema (nmap, hydra, gobuster, ffuf, wfuzz, searchsploit, netcat, etc.)
 
 ## Uso
 
-1. Clona el repositorio y accede a la carpeta del script.
-2. Ejecuta el script:
-    ```bash
-    python3 auto_nmap_opciones.py
-    ```
-3. Sigue las instrucciones del menú para elegir el tipo de escaneo o ataque.
-
-## Ejemplo de menú
-
-```
-Opciones de escaneo:
-1. Escaneo básico (puertos, --open, --min-rate)
-2. Escaneo de servicios y versiones (-sV)
-3. Detección de sistema operativo (-O)
-4. Guardar resultado en XML
-5. Guardar resultado en JSON
-6. Escaneo de servicios con -sV --script=default
-7. Escaneo agresivo (-A)
-8. Escaneo SYN sigiloso (-sS)
-9. Escaneos sigilosos con T1, T2, T3, T4
-10. Escaneo IPv6
-11. Escaneo de vulnerabilidades con NSE (--script vuln)
-12. Escaneo ARP para MACs (-PR)
-13. Ayuda para Nmap en Android
-14. Escaneo Nmap y carga en Metasploit (db_import)
-15. Escaneo de directorios con Dirsearch
-16. Fuerza bruta con Hydra (FTP, SSH, MySQL)
-17. Escaneo de directorios y archivos con Gobuster
-18. Escaneo de vulnerabilidades con Nessus
-19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
-20. Escaneo con script NSE personalizado
-21. Escaneo UDP (-sU)
-22. Escaneo de vulnerabilidades web con Nikto
-23. Detección de tecnologías con WhatWeb
-24. Enumeración de servicios SMB con Enum4linux
-25. Escaneo de vulnerabilidades con OpenVAS
-26. Fuzzing de directorios y parámetros web con Wfuzz
-27. Fuzzing de directorios y archivos web con FFUF
-h. Mostrar esta ayuda
+```bash
+python3 auto_nmap_opciones.py
 ```
 
-## Personalización
+Sigue el menú interactivo y selecciona la opción deseada.
 
-Puedes agregar más herramientas o modificar los comandos en el script para adaptarlo a tus necesidades.
+## Ejemplo de opciones
 
-## Créditos
+- **Escaneo básico:**  
+  Escanea puertos abiertos rápidamente.
+- **Fuzzing con FFUF:**  
+  Busca archivos y directorios ocultos en aplicaciones web.
+- **Searchsploit:**  
+  Busca exploits locales para un servicio o versión específica.
+- **Netcat:**  
+  Consulta comandos útiles para transferencia de archivos y shells reversas.
 
-Script desarrollado por [Tu Nombre o Usuario de GitHub].
+## Notas
+
+- Para usar proxychains y Tor, selecciona la opción al inicio.
+- Los resultados de Searchsploit se guardan automáticamente en archivos de texto.
+- Revisa la ayuda integrada (`h`) para ver todas las opciones disponibles.
+
+## Licencia
+
+MIT
 
 ---
 
-**¡Automatiza tus escaneos y pentesting de forma sencilla!**
+¿Quieres agregar ejemplos de uso para alguna opción específica o personalizar alguna sección?# Automatizaciones de Pentesting
+
+Herramienta en Python para automatizar escaneos y tareas comunes de pentesting usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat y más.
+
+## Características
+
+- Escaneo de puertos y servicios con Nmap (varios modos y formatos)
+- Detección de vulnerabilidades con scripts NSE y Nikto
+- Fuerza bruta de contraseñas con Hydra
+- Fuzzing de directorios y archivos con Gobuster, FFUF y Wfuzz
+- Generación de payloads con msfvenom
+- Búsqueda de exploits locales con Searchsploit
+- Comandos útiles de Netcat
+- Integración con herramientas como Enum4linux, Dirsearch, Nessus, OpenVAS, WhatWeb, etc.
+- Validación de diccionarios y URLs para evitar errores comunes
+
+## Requisitos
+
+- Python 3.x
+- Las herramientas externas instaladas en el sistema (nmap, hydra, gobuster, ffuf, wfuzz, searchsploit, netcat, etc.)
+
+## Uso
+
+```bash
+python3 auto_nmap_opciones.py
+```
+
+Sigue el menú interactivo y selecciona la opción deseada.
+
+## Ejemplo de opciones
+
+- **Escaneo básico:**  
+  Escanea puertos abiertos rápidamente.
+- **Fuzzing con FFUF:**  
+  Busca archivos y directorios ocultos en aplicaciones web.
+- **Searchsploit:**  
+  Busca exploits locales para un servicio o versión específica.
+- **Netcat:**  
+  Consulta comandos útiles para transferencia de archivos y shells reversas.
+
+## Notas
+
+- Para usar proxychains y Tor, selecciona la opción al inicio.
+- Los resultados de Searchsploit se guardan automáticamente en archivos de texto.
+- Revisa la ayuda integrada (`h`) para ver todas las opciones disponibles.
+
+## Licencia
+
+MIT
+
+---
+
+¿Quieres agregar ejemplos de uso para alguna opción específica
