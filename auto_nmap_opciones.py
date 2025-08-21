@@ -1,6 +1,7 @@
 import re
 import subprocess
 import time
+import os
 
 def validar_objetivo(objetivo):
     ip_regex = r"^\d{1,3}(\.\d{1,3}){3}$"
@@ -366,8 +367,13 @@ def escaneo_ffuf(target, wordlist, ext="", extra=""):
     if extra:
         comando += extra.split()
     ejecutar_comando(comando)
+def validar_url_fuzz(url):
+    return (url.startswith("http://") or url.startswith("https://")) and "FUZZ" in url
+def escaneo_searchsploit(servicio):
+    comando = ["searchsploit", servicio]
+    ejecutar_comando(comando)
 def mostrar_ayuda():
-    print("""
+    print(""")
 Opciones de escaneo con Nmap y herramientas relacionadas:
 1. Escaneo básico (puertos, --open, --min-rate)                                                                                                                                                                                                                                    
 2. Escaneo de servicios y versiones (-sV)
@@ -394,8 +400,9 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 23. Detección de tecnologías con WhatWeb
 24. Enumeración de servicios SMB con Enum4linux
 25. Escaneo de vulnerabilidades con OpenVAS
-26. Fuzzing de directorios y parametros web con Wfuzz
+26. Fuzzing de directorios y parametros web con Wfuzz (usa FUZZ en la URL)
 27. Fuzzing de directorios y archivos web con FFUF
+28. Busqueda de exploits locales con Searchsploit
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -516,11 +523,29 @@ elif opcion == "24":
 elif opcion == "25":
     escaneo_openvas(objetivo, extra)
 elif opcion == "26":
-    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
-    escaneo_wfuzz(objetivo, wordlist, extra)
+    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
+    url_fuzz = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
+    if not os.path.isfile(wordlist):
+        print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
+    elif not validar_url_fuzz(url_fuzz):
+        print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
+    else:
+        escaneo_wfuzz(url_fuzz, wordlist, extra)
+
 elif opcion == "27":
-    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
+    url_ffuf = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
     ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
-    escaneo_ffuf(objetivo, wordlist, ext, extra)
-else:  
+    if not os.path.isfile(wordlist):
+        print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
+    elif not validar_url_fuzz(url_ffuf):
+        print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
+    else:
+        escaneo_ffuf(url_ffuf, wordlist, ext, extra)
+
+elif opcion == "28":
+    servicio = input("Servicio, versión o palabra clave a buscar en Searchsploit: ")
+    escaneo_searchsploit(servicio)
+
+else:
     print("Opción no válida.")
