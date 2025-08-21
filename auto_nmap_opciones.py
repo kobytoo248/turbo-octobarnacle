@@ -370,8 +370,15 @@ def escaneo_ffuf(target, wordlist, ext="", extra=""):
 def validar_url_fuzz(url):
     return (url.startswith("http://") or url.startswith("https://")) and "FUZZ" in url
 def escaneo_searchsploit(servicio):
+    salida = f"searchsploit_{servicio.replace(' ', '_')}.txt"
     comando = ["searchsploit", servicio]
-    ejecutar_comando(comando)
+    print(f"\nEjecutando: {' '.join(comando)}")
+    with open(salida, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {salida}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar Searchsploit: {e}")
 def mostrar_ayuda():
     print(""")
 Opciones de escaneo con Nmap y herramientas relacionadas:
