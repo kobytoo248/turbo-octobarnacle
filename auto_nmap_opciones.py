@@ -334,11 +334,42 @@ def generar_payload_msfvenom():
         print(f"Payload generado: {nombre}")
     except subprocess.CalledProcessError as e:
         print(f"Error al generar el payload: {e}")
-
-def mostrar_ayuda(): 
+def escaneo_nikto(target, extra=""):
+    comando = ["nikto", "-h", target]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+def escaneo_whatweb(target, extra=""):
+    comando = ["whatweb", target]
+    if extra:
+        comando += extra.split()
+        ejecutar_comando(comando)
+def escaneo_enum4linux(target, extra=""):
+    comando = ["enum4linux", "-a", target]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+def escaneo_openvas(target, extra=""):
+    print(f"Lanza el escaneo de OpenVAS manualmente para el objetivo: {target}")
+    print("Puedes automatizar esto usando la API o el CLI de OpenVAS cuando lo configures.")
+    if extra:
+        print(f"Parámetros extra: {extra}")
+def escaneo_wfuzz(target, wordlist, extra=""):
+    comando = ["wfuzz", "-c", "-w", wordlist, target]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+def escaneo_ffuf(target, wordlist, ext="", extra=""):
+    comando = ["ffuf", "-u", f"{target}/FUZZ", "-w", wordlist]
+    if ext:
+        comando += ["-e", ext]
+    if extra:
+        comando += extra.split()
+    ejecutar_comando(comando)
+def mostrar_ayuda():
     print("""
-Opciones de escaneo:
-1. Escaneo básico (puertos, --open, --min-rate)
+Opciones de escaneo con Nmap y herramientas relacionadas:
+1. Escaneo básico (puertos, --open, --min-rate)                                                                                                                                                                                                                                    
 2. Escaneo de servicios y versiones (-sV)
 3. Detección de sistema operativo (-O)
 4. Guardar resultado en XML
@@ -359,8 +390,14 @@ Opciones de escaneo:
 19. Generar payloads con msfvenom (Windows, Linux, Android, Mac, etc.)
 20. Escaneo con script MSE personalizado
 21. Escaneo UDP (-sU)
-h. Mostrar esta ayuda     
-""")      
+22. Escaneo de vulnerabilidades web con Nikto
+23. Detección de tecnologías con WhatWeb
+24. Enumeración de servicios SMB con Enum4linux
+25. Escaneo de vulnerabilidades con OpenVAS
+26. Fuzzing de directorios y parametros web con Wfuzz
+27. Fuzzing de directorios y archivos web con FFUF
+h. Mostrar esta ayuda
+""")
 if __name__ == "__main__":
     usar_proxychains = input("¿Quieres usar proxychains y Tor para el escaneo? (s/n): ").lower() == "s"
     objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
@@ -470,5 +507,20 @@ elif opcion == "21":
         mostrar_resumen_servicios("nmap_udp.txt")
 elif opcion.lower() == "h":
     mostrar_ayuda()
-else:
+elif opcion == "22":
+    escaneo_nikto(objetivo, extra)
+elif opcion == "23":
+    escaneo_whatweb(objetivo, extra)
+elif opcion == "24":
+    escaneo_enum4linux(objetivo, extra)
+elif opcion == "25":
+    escaneo_openvas(objetivo, extra)
+elif opcion == "26":
+    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+    escaneo_wfuzz(objetivo, wordlist, extra)
+elif opcion == "27":
+    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+    ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
+    escaneo_ffuf(objetivo, wordlist, ext, extra)
+else:  
     print("Opción no válida.")
