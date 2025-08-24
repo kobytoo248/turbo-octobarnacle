@@ -396,8 +396,17 @@ def ejecutar_msfconsole(script_rc):
         subprocess.run(comando, check=True)
     except subprocess.CalledProcessError as e:
         print(f"Error al ejecutar Metasploit: {e}")
+def escaneo_john(hashfile, wordlist):
+    comando = ["john", "--wordlist=" + wordlist, hashfile]
+    ejecutar_comando(comando)
+def escaneo_hashcat(hashfile, wordlist, mode):
+    comando = ["hashcat", "-m", str(mode), hashfile, wordlist]
+    ejecutar_comando(comando)
+def escaneo_aircrack(capture_file, wordlist):
+    comando = ["aircrack-ng", "-w", wordlist, capture_file]
+    ejecutar_comando(comando)
 def mostrar_ayuda():
-    print(""")
+    print("""
 Opciones de escaneo con Nmap y herramientas relacionadas:
 1. Escaneo básico (puertos, --open, --min-rate)                                                                                                                                                                                                                                    
 2. Escaneo de servicios y versiones (-sV)
@@ -429,6 +438,9 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 28. Busqueda de exploits locales con Searchsploit
 29. Comandos útiles de Netcat
 30. Ejecutar Metasploit con script .rc automatizado
+31. Cracking de hashes con John the Ripper
+32. Cracking de hashes con Hashcat
+33. Cracking de WiFi WPA/WPA2 con Aircrack-ng
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -548,5 +560,29 @@ if __name__ == "__main__":
                 print(f"El archivo '{script_rc}' no existe. Verifica la ruta.")
             else:
                 ejecutar_msfconsole(script_rc)
-        else:
-            print("Opción no válida.")
+elif opcion == "31":
+    hashfile = input("Ruta al archivo de hashes para John the Ripper: ").strip()
+    wordlist = input("Ruta al diccionario de palabras: ").strip()
+    if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
+        print("Archivo de hashes o diccionario no existe.")
+    else:
+        escaneo_john(hashfile, wordlist)
+
+elif opcion == "32":
+    hashfile = input("Ruta al archivo de hashes para Hashcat: ").strip()
+    wordlist = input("Ruta al diccionario de palabras: ").strip()
+    mode = input("Modo de hashcat (-m, ejemplo: 0 para MD5, 1000 para NTLM): ").strip()
+    if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
+        print("Archivo de hashes o diccionario no existe.")
+    else:
+        escaneo_hashcat(hashfile, wordlist, mode)
+
+elif opcion == "33":
+    capture_file = input("Ruta al archivo de captura (.cap) para Aircrack-ng: ").strip()
+    wordlist = input("Ruta al diccionario de palabras: ").strip()
+    if not os.path.isfile(capture_file) or not os.path.isfile(wordlist):
+        print("Archivo de captura o diccionario no existe.")
+    else:
+        escaneo_aircrack(capture_file, wordlist)
+else:
+    print("Opción no válida.")
