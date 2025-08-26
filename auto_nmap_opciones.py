@@ -10,6 +10,9 @@ def validar_objetivo(objetivo):
     if re.match(ip_regex, objetivo) or re.match(dominio_regex, objetivo) or re.match(ipv6_regex, objetivo):
         return True
     return False
+def validar_dominio(dominio):
+    dominio_regex = r"^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+    return re.match(dominio_regex, dominio)
 
 def ejecutar_comando(comando):
     global usar_proxychains
@@ -18,12 +21,14 @@ def ejecutar_comando(comando):
     print(f"\nEjecutando: {' '.join(comando)}")
     inicio = time.time()
     try:
-        subprocess.run(comando, check=True)
+        resultado = subprocess.run(comando, check=True, capture_output=True, text=True)
+        print(resultado.stdout)
         print(f"Escaneo completado en {round(time.time() - inicio, 2)} segundos.")
     except subprocess.CalledProcessError as e:
-        print(f"Error al ejecutar Nmap: {e}")
+        print(f"Error al ejecutar el comando: {e}")
+        print(e.output)
     except FileNotFoundError:
-        print("Nmap no está instalado o no se encuentra en el PATH.")
+        print("La herramienta no está instalada o no se encuentra en el PATH.")
 
 def escaneo_basico(target, min_rate, extra="", puertos="", formato="txt"):
     salida = "nmap_result." + formato
@@ -399,11 +404,25 @@ def ejecutar_msfconsole(script_rc):
 def escaneo_john(hashfile, wordlist):
     comando = ["john", "--wordlist=" + wordlist, hashfile]
     ejecutar_comando(comando)
+    # Mostrar las contraseñas crackeadas
+    subprocess.run(["john", "--show", hashfile])
 def escaneo_hashcat(hashfile, wordlist, mode):
     comando = ["hashcat", "-m", str(mode), hashfile, wordlist]
     ejecutar_comando(comando)
 def escaneo_aircrack(capture_file, wordlist):
     comando = ["aircrack-ng", "-w", wordlist, capture_file]
+    ejecutar_comando(comando)
+def escaneo_amass(dominio):
+    comando = ["amass", "enum", "-d", dominio]
+    ejecutar_comando(comando)
+def escaneo_sublist3r(dominio):
+    comando = ["sublist3r", "-d", dominio]
+    ejecutar_comando(comando)
+def escaneo_dnsenum(dominio):
+    comando = ["dnsenum", dominio]
+    ejecutar_comando(comando)
+def escaneo_theharvester(dominio, fuente="google", limite="100"):
+    comando = ["theHarvester", "-d", dominio, "-b", fuente, "-l", limite]
     ejecutar_comando(comando)
 def mostrar_ayuda():
     print("""
@@ -441,6 +460,10 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 31. Cracking de hashes con John the Ripper
 32. Cracking de hashes con Hashcat
 33. Cracking de WiFi WPA/WPA2 con Aircrack-ng
+34. Enumeración de subdominios con amass
+35. Enumeración de subdominios con sublist3r
+36. Enumeración DNS con dnsenum
+37. Recolección de correos y dominios con theHarvester
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -452,7 +475,7 @@ if __name__ == "__main__":
 
     while True:
         mostrar_ayuda()
-        opcion = input("Elige una opción (1-30, h para ayuda, q para salir): ")
+        opcion = input("Elige una opción (1-37, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
             break
@@ -560,29 +583,56 @@ if __name__ == "__main__":
                 print(f"El archivo '{script_rc}' no existe. Verifica la ruta.")
             else:
                 ejecutar_msfconsole(script_rc)
-elif opcion == "31":
-    hashfile = input("Ruta al archivo de hashes para John the Ripper: ").strip()
-    wordlist = input("Ruta al diccionario de palabras: ").strip()
-    if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
-        print("Archivo de hashes o diccionario no existe.")
-    else:
-        escaneo_john(hashfile, wordlist)
+        elif opcion == "31":
+            hashfile = input("Ruta al archivo de hashes para John the Ripper: ").strip()
+            wordlist = input("Ruta al diccionario de palabras: ").strip()
+            if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
+                print("Archivo de hashes o diccionario no existe.")
+            else:
+                escaneo_john(hashfile, wordlist)
 
-elif opcion == "32":
-    hashfile = input("Ruta al archivo de hashes para Hashcat: ").strip()
-    wordlist = input("Ruta al diccionario de palabras: ").strip()
-    mode = input("Modo de hashcat (-m, ejemplo: 0 para MD5, 1000 para NTLM): ").strip()
-    if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
-        print("Archivo de hashes o diccionario no existe.")
-    else:
-        escaneo_hashcat(hashfile, wordlist, mode)
+        elif opcion == "32":
+            hashfile = input("Ruta al archivo de hashes para Hashcat: ").strip()
+            wordlist = input("Ruta al diccionario de palabras: ").strip()
+            mode = input("Modo de hashcat (-m, ejemplo: 0 para MD5, 1000 para NTLM): ").strip()
+            if not os.path.isfile(hashfile) or not os.path.isfile(wordlist):
+                print("Archivo de hashes o diccionario no existe.")
+            else:
+                escaneo_hashcat(hashfile, wordlist, mode)
 
-elif opcion == "33":
-    capture_file = input("Ruta al archivo de captura (.cap) para Aircrack-ng: ").strip()
-    wordlist = input("Ruta al diccionario de palabras: ").strip()
-    if not os.path.isfile(capture_file) or not os.path.isfile(wordlist):
-        print("Archivo de captura o diccionario no existe.")
-    else:
-        escaneo_aircrack(capture_file, wordlist)
-else:
-    print("Opción no válida.")
+        elif opcion == "33":
+            capture_file = input("Ruta al archivo de captura (.cap) para Aircrack-ng: ").strip()
+            wordlist = input("Ruta al diccionario de palabras: ").strip()
+            if not os.path.isfile(capture_file) or not os.path.isfile(wordlist):
+                print("Archivo de captura o diccionario no existe.")
+            else:
+                escaneo_aircrack(capture_file, wordlist)
+
+        elif opcion == "34":
+            dominio = input("Dominio objetivo para enumerar subdominios con amass: ").strip()
+            if not validar_dominio(dominio):
+                print("Dominio no válido. Debe ser del tipo ejemplo.com")
+            else:
+                escaneo_amass(dominio)
+        elif opcion == "35":
+            dominio = input("Dominio objetivo para enumerar subdominios con sublist3r: ").strip()
+            if not validar_dominio(dominio):
+                print("Dominio no válido. Debe ser del tipo ejemplo.com")
+            else:
+                escaneo_sublist3r(dominio)
+        elif opcion == "36":
+            dominio = input("Dominio objetivo para enumerar DNS con dnsenum: ").strip()
+            if not validar_dominio(dominio):
+                print("Dominio no válido. Debe ser del tipo ejemplo.com")
+            else:
+                escaneo_dnsenum(dominio)
+        elif opcion == "37":
+            dominio = input("Dominio objetivo para recolectar información con theHarvester: ").strip()
+            if not validar_dominio(dominio):
+                print("Dominio no válido. Debe ser del tipo ejemplo.com")
+            else:
+                fuente = input("Fuente (google, bing, yahoo, etc.) [por defecto: google]: ").strip() or "google"
+                limite = input("Límite de resultados [por defecto: 100]: ").strip() or "100"
+                escaneo_theharvester(dominio, fuente, limite)
+        else:
+            print("Opción no válida.")
