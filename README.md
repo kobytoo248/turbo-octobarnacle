@@ -1,6 +1,6 @@
 # Automatizaciones de Pentesting
 
-Herramienta en Python para automatizar escaneos y tareas comunes de pentesting usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat, Metasploit, John the Ripper, Hashcat y Aircrack-ng.
+Herramienta en Python para automatizar escaneos y tareas comunes de pentesting usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat, Metasploit, John the Ripper, Hashcat, Aircrack-ng, amass, sublist3r, dnsenum y theHarvester.
 
 ## Características
 
@@ -14,14 +14,16 @@ Herramienta en Python para automatizar escaneos y tareas comunes de pentesting u
 - Automatización de Metasploit con archivos `.rc`
 - Cracking de hashes con John the Ripper y Hashcat
 - Cracking de WiFi WPA/WPA2 con Aircrack-ng
-- Integración con herramientas como Enum4linux, Dirsearch, Nessus, OpenVAS, WhatWeb, etc.
+- Enumeración de subdominios con amass y sublist3r
+- Enumeración DNS con dnsenum
+- Recolección de correos y dominios con theHarvester
 - Validación de diccionarios y URLs para evitar errores comunes
 - Menú interactivo en bucle para ejecutar varias opciones sin reiniciar el script
 
 ## Requisitos
 
 - Python 3.x
-- Las herramientas externas instaladas en el sistema (`nmap`, `hydra`, `gobuster`, `ffuf`, `wfuzz`, `searchsploit`, `netcat`, `msfvenom`, `msfconsole`, `john`, `hashcat`, `aircrack-ng`, etc.)
+- Las herramientas externas instaladas en el sistema (`nmap`, `hydra`, `gobuster`, `ffuf`, `wfuzz`, `searchsploit`, `netcat`, `msfvenom`, `msfconsole`, `john`, `hashcat`, `aircrack-ng`, `amass`, `sublist3r`, `dnsenum`, `theHarvester`, etc.)
 
 ## Uso
 
@@ -32,32 +34,41 @@ python3 auto_nmap_opciones.py
 Sigue el menú interactivo y selecciona la opción deseada.  
 Para salir, escribe `q` en el menú.
 
-## Ejemplo de opciones
+## Opciones principales
 
-- **Escaneo básico:**  
-  Escanea puertos abiertos rápidamente.
-- **Fuzzing con FFUF y Wfuzz:**  
-  Busca archivos y directorios ocultos en aplicaciones web.
-- **Searchsploit:**  
-  Busca exploits locales para un servicio o versión específica y guarda los resultados en un archivo.
-- **Netcat:**  
-  Consulta comandos útiles para transferencia de archivos y shells reversas.
-- **Metasploit:**  
-  Ejecuta msfconsole con un archivo `.rc` para automatizar exploits y payloads.
+1. Escaneo básico de puertos
+2. Escaneo de servicios y versiones
+...
+31. Cracking de hashes con John the Ripper
+32. Cracking de hashes con Hashcat
+33. Cracking de WiFi WPA/WPA2 con Aircrack-ng
+34. Enumeración de subdominios con amass
+35. Enumeración de subdominios con sublist3r
+36. Enumeración DNS con dnsenum
+37. Recolección de correos y dominios con theHarvester
+
+## Ejemplo de uso
+
 - **John the Ripper:**  
-  Crackea hashes usando diccionarios personalizados.
+  Selecciona la opción 31 y proporciona el archivo de hashes y el diccionario.
 - **Hashcat:**  
-  Crackea hashes con soporte para múltiples algoritmos y modos.
+  Selecciona la opción 32, indica el archivo de hashes, el diccionario y el modo.
 - **Aircrack-ng:**  
-  Crackea contraseñas WPA/WPA2 de redes WiFi usando archivos de captura y diccionarios.
+  Selecciona la opción 33, indica el archivo .cap y el diccionario.
+- **amass/sublist3r/dnsenum/theHarvester:**  
+  Ingresa un dominio válido (ejemplo.com) y sigue las instrucciones.
 
 ## Notas
 
 - Para usar proxychains y Tor, selecciona la opción al inicio.
-- Los resultados de Searchsploit se guardan automáticamente en archivos de texto.
+- Los resultados de Searchsploit y otros escaneos se pueden guardar automáticamente en archivos de texto.
 - Revisa la ayuda integrada (`h`) para ver todas las opciones disponibles.
 - Puedes ejecutar varias opciones sin reiniciar el script.
 
 ## Licencia
 
 MIT
+
+---
+
+¿Quieres agregar ejemplos de uso para alguna opción específica o personalizar
