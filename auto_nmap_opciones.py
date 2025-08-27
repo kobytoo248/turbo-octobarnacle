@@ -424,6 +424,48 @@ def escaneo_dnsenum(dominio):
 def escaneo_theharvester(dominio, fuente="google", limite="100"):
     comando = ["theHarvester", "-d", dominio, "-b", fuente, "-l", limite]
     ejecutar_comando(comando)
+def escaneo_netdiscover(rango="192.168.1.0/24"):
+    comando = ["netdiscover", "-r", rango]
+    ejecutar_comando(comando)
+def escaneo_nuclei(target, template=""):
+    comando = ["nuclei", "-u", target]
+    if template:
+        comando += ["-t", template]
+    ejecutar_comando(comando)
+def escaneo_cewl(url, profundidad="2", min_long="5", salida="cewl_wordlist.txt"):
+    comando = [
+        "cewl", url,
+        "-d", profundidad,
+        "-m", min_long,
+        "-w", salida
+    ]
+    ejecutar_comando(comando)
+def escaneo_medusa(target, servicio, usuario, diccionario, hilos="4"):
+    comando = [
+        "medusa", "-h", target, "-u", usuario, "-P", diccionario, "-M", servicio, "-t", str(hilos)
+    ]
+    ejecutar_comando(comando)
+def escaneo_rustscan(target, puertos="1-65535"):
+    comando = ["rustscan", "-a", target, "-r", puertos]
+    ejecutar_comando(comando)
+def escaneo_impacket_getnpusers(target, usuario, dominio, diccionario=""):
+    comando = ["GetNPUsers.py", f"{dominio}/{usuario}", "-dc-ip", target]
+    if diccionario:
+        comando += ["-outputfile", diccionario]
+    ejecutar_comando(comando)
+def escaneo_wpscan(url, api_token=""):
+    comando = ["wpscan", "--url", url]
+    if api_token:
+        comando += ["--api-token", api_token]
+    ejecutar_comando(comando)
+def escaneo_joomscan(url):
+    comando = ["joomscan", "--url", url]
+    ejecutar_comando(comando)
+def escaneo_xsser(url, metodo="GET", parametros=""):
+    comando = ["xsser", "-u", url]
+    if metodo.upper() == "POST":
+        comando += ["--data", parametros]
+    ejecutar_comando(comando)
 def mostrar_ayuda():
     print("""
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -464,6 +506,15 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 35. Enumeración de subdominios con sublist3r
 36. Enumeración DNS con dnsenum
 37. Recolección de correos y dominios con theHarvester
+38. Descubrimiento de hosts en red local con netdiscover
+39. Escaneo de vulnerabilidades con nuclei
+40. Generador de diccionarios personalizados con cewl
+41. Fuerza bruta de servicios con medusa
+42. Escaneo de puertos rápido con rustscan
+43. Ataques Kerberos AS-REP roasting con impacket (GetNPUsers.py)
+44. Escaneo de vulnerabilidades en WordPress con wpscan
+45. Escaneo de vulnerabilidades en Joomla con joomscan
+46. Detección de XSS en aplicaciones web con xsser
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -475,7 +526,7 @@ if __name__ == "__main__":
 
     while True:
         mostrar_ayuda()
-        opcion = input("Elige una opción (1-37, h para ayuda, q para salir): ")
+        opcion = input("Elige una opción (1-46, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
             break
@@ -634,5 +685,52 @@ if __name__ == "__main__":
                 fuente = input("Fuente (google, bing, yahoo, etc.) [por defecto: google]: ").strip() or "google"
                 limite = input("Límite de resultados [por defecto: 100]: ").strip() or "100"
                 escaneo_theharvester(dominio, fuente, limite)
+        elif opcion == "38":
+            rango = input("Rango de red para descubrir hosts (ejemplo: 192.168.1.0/24): ").strip()
+            escaneo_netdiscover(rango)
+        elif opcion == "39":
+            target = input("URL o IP objetivo para escanear con nuclei: ").strip()
+            template = input("Ruta al template de nuclei (deja vacío para usar los por defecto): ").strip()
+            escaneo_nuclei(target, template)
+        elif opcion == "40":
+            url = input("URL objetivo para generar diccionario con cewl (ejemplo: http://example.com): ").strip()
+            profundidad = input("Profundidad de rastreo [por defecto: 2]: ").strip() or "2"
+            min_long = input("Longitud mínima de palabras [por defecto: 5]: ").strip() or "5"
+            salida = input("Nombre de archivo de salida [por defecto: cewl_wordlist.txt]: ").strip() or "cewl_wordlist.txt"
+            escaneo_cewl(url, profundidad, min_long, salida)
+        elif opcion == "41":
+            target = input("IP o dominio objetivo para fuerza bruta con medusa: ").strip()
+            servicio = input("Servicio a atacar (ejemplo: ftp, ssh, mysql, http, smb, rdp, telnet, vnc, etc.): ").strip()
+            usuario = input("Usuario objetivo: ").strip()
+            diccionario = input("Ruta al diccionario de contraseñas: ").strip()
+            hilos = input("Número de hilos [por defecto: 4]: ").strip() or "4"
+            if not os.path.isfile(diccionario):
+                print(f"El diccionario '{diccionario}' no existe. Verifica la ruta.")
+            else:
+                escaneo_medusa(target, servicio, usuario, diccionario, hilos)
+        elif opcion == "42":
+            target = input("IP o dominio objetivo para escanear con rustscan: ").strip()
+            puertos = input("Rango de puertos (ejemplo: 1-65535) [por defecto: 1-65535]: ").strip() or "1-65535"
+            escaneo_rustscan(target, puertos)
+        elif opcion == "43":
+            target = input("IP del controlador de dominio (DC): ").strip()
+            usuario = input("Usuario objetivo: ").strip()
+            dominio = input("Dominio objetivo: ").strip()
+            diccionario = input("Archivo de salida (deja vacío si no): ").strip()
+            escaneo_impacket_getnpusers(target, usuario, dominio, diccionario)
+        elif opcion == "44":
+            url = input("URL objetivo para escanear WordPress con wpscan (ejemplo: http://example.com): ").strip()
+            api_token = input("API token de wpscan (deja vacío si no tienes): ").strip()
+            escaneo_wpscan(url, api_token) 
+        elif opcion == "45":
+            url = input("URL objetivo para escanear Joomla con joomscan (ejemplo: http://example.com): ").strip()
+            escaneo_joomscan(url)
+        elif opcion == "46":
+            url = input("URL objetivo para escanear XSS con xsser (ejemplo: http://example.com): ").strip()
+            metodo = input("Método HTTP (GET/POST) [por defecto: GET]: ").strip() or "GET"
+            parametros = ""
+            if metodo.upper() == "POST":
+                parametros = input("Parámetros POST (ejemplo: usuario=admin&pass=1234): ").strip()
+            escaneo_xsser(url, metodo, parametros)
         else:
             print("Opción no válida.")
