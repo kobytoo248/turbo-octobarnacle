@@ -466,6 +466,65 @@ def escaneo_xsser(url, metodo="GET", parametros=""):
     if metodo.upper() == "POST":
         comando += ["--data", parametros]
     ejecutar_comando(comando)
+def escaneo_reconng(target, workspace="default"):
+    comando = ["recon-ng", "-w", workspace, "-r", target]
+    ejecutar_comando(comando)
+def escaneo_spiderfoot(target, output="spiderfoot_result.html"):
+    comando = [
+        "spiderfoot", "-s", target, "-o", "html", "-F", "-o", output
+    ]
+    ejecutar_comando(comando)
+def escaneo_shodan(query, output="shodan_result.txt"):
+    comando = ["shodan", "search", query, "--limit", "100"]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar Shodan: {e}")
+def lanzar_maltego():
+    comando = ["maltego"]
+    print(f"\nEjecutando: {' '.join(comando)}")
+    try:
+        subprocess.run(comando, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error al ejecutar Maltego: {e}")
+def escaneo_ghunt(email, output="ghunt_result.txt"):
+    comando = ["python3", "/ruta/a/GHunt/ghunt.py", "email", email]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar GHunt: {e}")
+def escaneo_social_analyzer(usuario, output="social_analyzer_result.json"):
+    comando = [
+        "python3", "/ruta/a/social-analyzer/social-analyzer.py",
+        "-u", usuario,
+        "-o", output,
+        "-f", "json"
+    ]
+    try:
+        subprocess.run(comando, check=True)
+        print(f"Resultados guardados en: {output}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error al ejecutar Social Analyzer: {e}")
+def escaneo_censys(query, output="censys_result.txt"):
+    comando = ["censys", "search", "ipv4", query, "--limit", "100"]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar Censys: {e}")
+def escaneo_exiftool(archivo, output="exiftool_result.txt"):
+    comando = ["exiftool", archivo]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Metadatos extraídos y guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar ExifTool: {e}")
 def mostrar_ayuda():
     print("""
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -515,6 +574,14 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 44. Escaneo de vulnerabilidades en WordPress con wpscan
 45. Escaneo de vulnerabilidades en Joomla con joomscan
 46. Detección de XSS en aplicaciones web con xsser
+47. Automatización de Recon-ng (ejecutar scripts .rc en workspace)
+48. Recolección OSINT automatizada con SpiderFoot
+49. Búsqueda OSINT en dispositivos con Shodan
+50. Lanzar Maltego para investigaciones OSINT gráficas
+51. Recolección OSINT sobre cuentas Google con GHunt
+52. Búsqueda OSINT de perfiles en redes sociales con Social Analyzer
+53. Búsqueda OSINT en hosts con Censys
+54. Extracción de metadatos de archivos con ExifTool (alternativa a FOCA)
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -526,7 +593,7 @@ if __name__ == "__main__":
 
     while True:
         mostrar_ayuda()
-        opcion = input("Elige una opción (1-46, h para ayuda, q para salir): ")
+        opcion = input("Elige una opción (1-54, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
             break
@@ -732,5 +799,39 @@ if __name__ == "__main__":
             if metodo.upper() == "POST":
                 parametros = input("Parámetros POST (ejemplo: usuario=admin&pass=1234): ").strip()
             escaneo_xsser(url, metodo, parametros)
+        elif opcion == "47":
+            target = input("Script de Recon-ng a ejecutar (ejemplo: script.rc): ").strip()
+            workspace = input("Workspace de Recon-ng [por defecto: default]: ").strip() or "default"
+            escaneo_reconng(target, workspace)
+        elif opcion == "48":
+            target = input("Dominio, IP o palabra clave para escanear con SpiderFoot: ").strip()
+            output = input("Archivo de salida [por defecto: spiderfoot_result.html]: ").strip() or "spiderfoot_result.html"
+            escaneo_spiderfoot(target, output)
+        elif opcion == "49":
+            query = input("Consulta de búsqueda para Shodan (ejemplo: apache country:ES): ").strip()
+            output = input("Archivo de salida [por defecto: shodan_result.txt]: ").strip() or "shodan_result.txt"
+            escaneo_shodan(query, output)
+        elif opcion == "50":
+            print("Maltego se abrirá en modo gráfico. Realiza tus investigaciones OSINT desde la interfaz.")
+            lanzar_maltego()
+        elif opcion == "51":
+            email = input("Correo objetivo para OSINT con GHunt: ").strip()
+            output = input("Archivo de salida [por defecto: ghunt_result.txt]: ").strip() or "ghunt_result.txt"
+            escaneo_ghunt(email, output)
+        elif opcion == "52":
+            usuario = input("Usuario, nombre o correo para buscar en redes sociales: ").strip()
+            output = input("Archivo de salida [por defecto: social_analyzer_result.json]: ").strip() or "social_analyzer_result.json"
+            escaneo_social_analyzer(usuario, output)
+        elif opcion == "53":
+            query = input("Consulta de búsqueda para Censys (ejemplo: 443.http.get.headers.server: Apache): ").strip()
+            output = input("Archivo de salida [por defecto: censys_result.txt]: ").strip() or "censys_result.txt"
+            escaneo_censys(query, output)
+        elif opcion == "54":
+            archivo = input("Ruta al archivo para extraer metadatos (imagen, PDF, DOC, etc.): ").strip()
+            output = input("Archivo de salida [por defecto: exiftool_result.txt]: ").strip() or "exiftool_result.txt"
+            if not os.path.isfile(archivo):
+                print(f"Error: El archivo '{archivo}' no existe. Verifica la ruta.")
+            else:
+                escaneo_exiftool(archivo, output)
         else:
             print("Opción no válida.")
