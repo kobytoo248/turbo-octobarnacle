@@ -525,6 +525,24 @@ def escaneo_exiftool(archivo, output="exiftool_result.txt"):
             print(f"Metadatos extraídos y guardados en: {output}")
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar ExifTool: {e}")
+def escaneo_sqlmap(url, output="sqlmap_result.txt", extra=""):
+    comando = ["sqlmap", "-u", url, "--batch", "-o"]
+    if extra:
+        comando += extra.split()
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar sqlmap: {e}")
+def escaneo_sherlock(usuario, output="sherlock_result.txt"):
+    comando = ["python3", "/ruta/a/sherlock/sherlock.py", usuario]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar Sherlock: {e}")
 def mostrar_ayuda():
     print("""
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -582,6 +600,8 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 52. Búsqueda OSINT de perfiles en redes sociales con Social Analyzer
 53. Búsqueda OSINT en hosts con Censys
 54. Extracción de metadatos de archivos con ExifTool (alternativa a FOCA)
+55. Automatización de SQL Injection con sqlmap
+56. Búsqueda de usuarios en redes sociales con Sherlock
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
@@ -593,7 +613,7 @@ if __name__ == "__main__":
 
     while True:
         mostrar_ayuda()
-        opcion = input("Elige una opción (1-54, h para ayuda, q para salir): ")
+        opcion = input("Elige una opción (1-56, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
             break
@@ -833,5 +853,14 @@ if __name__ == "__main__":
                 print(f"Error: El archivo '{archivo}' no existe. Verifica la ruta.")
             else:
                 escaneo_exiftool(archivo, output)
+        elif opcion == "55":
+            url = input("URL objetivo vulnerable a SQL Injection (ejemplo: http://example.com/page?id=1): ").strip()
+            output = input("Archivo de salida [por defecto: sqlmap_result.txt]: ").strip() or "sqlmap_result.txt"
+            extra = input("Parámetros extra para sqlmap (deja vacío si no): ").strip()
+            escaneo_sqlmap(url, output, extra)
+        elif opcion == "56":
+            usuario = input("Nombre de usuario para buscar en redes sociales con Sherlock: ").strip()
+            output = input("Archivo de salida [por defecto: sherlock_result.txt]: ").strip() or "sherlock_result.txt"
+            escaneo_sherlock(usuario, output)
         else:
             print("Opción no válida.")
