@@ -536,13 +536,36 @@ def escaneo_sqlmap(url, output="sqlmap_result.txt", extra=""):
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar sqlmap: {e}")
 def escaneo_sherlock(usuario, output="sherlock_result.txt"):
-    comando = ["python3", "/ruta/a/sherlock/sherlock.py", usuario]
+    comando = ["/root/.local/bin/sherlock", usuario]  # Usa la ruta que te dio 'which sherlock'
     with open(output, "w") as f:
         try:
             subprocess.run(comando, check=True, stdout=f)
             print(f"Resultados guardados en: {output}")
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar Sherlock: {e}")
+def escaneo_subfinder(dominio, output="subfinder_result.txt"):
+    comando = ["subfinder", "-d", dominio, "-o", output]
+    try:
+        subprocess.run(comando, check=True)
+        print(f"Resultados guardados en: {output}")
+    except subprocess.CalledProcessError as e:
+        print(f"Error al ejecutar Subfinder: {e}")
+def escaneo_crackmapexec(target, usuario, password, dominio=""):
+    comando = ["crackmapexec", "smb", target, "-u", usuario, "-p", password]
+    if dominio:
+        comando += ["-d", dominio]
+    try:
+        subprocess.run(comando, check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error al ejecutar CrackMapExec: {e}")
+def escaneo_binwalk(archivo, output="binwalk_result.txt"):
+    comando = ["binwalk", archivo]
+    with open(output, "w") as f:
+        try:
+            subprocess.run(comando, check=True, stdout=f)
+            print(f"Resultados guardados en: {output}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error al ejecutar Binwalk: {e}")
 def mostrar_ayuda():
     print("""
 Opciones de escaneo con Nmap y herramientas relacionadas:
@@ -602,18 +625,16 @@ Opciones de escaneo con Nmap y herramientas relacionadas:
 54. Extracción de metadatos de archivos con ExifTool (alternativa a FOCA)
 55. Automatización de SQL Injection con sqlmap
 56. Búsqueda de usuarios en redes sociales con Sherlock
+57. Enumeración de subdominios con Subfinder
+58. Automatización de ataques SMB/AD con CrackMapExec
+59. Análisis de archivos binarios y firmware con Binwalk
 h. Mostrar esta ayuda
 """)
 if __name__ == "__main__":
     usar_proxychains = input("¿Quieres usar proxychains y Tor para el escaneo? (s/n): ").lower() == "s"
-    objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
-    if not validar_objetivo(objetivo):
-        print("Objetivo inválido. Introduce una IP, dominio o IPv6 válido.")
-        exit(1)
-
     while True:
         mostrar_ayuda()
-        opcion = input("Elige una opción (1-56, h para ayuda, q para salir): ")
+        opcion = input("Elige una opción (1-59, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
             break
@@ -621,7 +642,19 @@ if __name__ == "__main__":
         if extra.lower() in ["si", "no"]:
             extra = ""
 
-        # Aquí van todos tus bloques de opciones (if/elif)
+        # Opciones que requieren objetivo
+        if opcion in [str(i) for i in range(1, 46)] + ["15", "16", "17", "18", "21"]:
+            objetivo = input("Introduce la IP, dominio o IPv6 objetivo: ")
+            if not validar_objetivo(objetivo):
+                print("Objetivo inválido. Introduce una IP, dominio o IPv6 válido.")
+                continue
+
+        # Opciones que NO requieren objetivo (ejemplo: 56 Sherlock)
+        if opcion == "56":
+            usuario = input("Nombre de usuario para buscar en redes sociales con Sherlock: ").strip()
+            output = input("Archivo de salida [por defecto: sherlock_result.txt]: ").strip() or "sherlock_result.txt"
+            escaneo_sherlock(usuario, output)
+        # ...resto de opciones...
         if opcion == "1":
             escaneo_basico(objetivo, min_rate=1000, extra=extra, puertos="", formato="txt")
             mostrar_resumen_servicios("nmap_result.txt")
@@ -859,8 +892,23 @@ if __name__ == "__main__":
             extra = input("Parámetros extra para sqlmap (deja vacío si no): ").strip()
             escaneo_sqlmap(url, output, extra)
         elif opcion == "56":
+            print("Sherlock solo requiere el nombre de usuario. No necesitas IP ni dominio.")
             usuario = input("Nombre de usuario para buscar en redes sociales con Sherlock: ").strip()
             output = input("Archivo de salida [por defecto: sherlock_result.txt]: ").strip() or "sherlock_result.txt"
             escaneo_sherlock(usuario, output)
+        elif opcion == "57":
+            dominio = input("Dominio objetivo para enumerar subdominios con Subfinder: ").strip()
+            output = input("Archivo de salida [por defecto: subfinder_result.txt]: ").strip() or "subfinder_result.txt"
+            escaneo_subfinder(dominio, output)
+        elif opcion == "58":
+            target = input("IP o rango objetivo para CrackMapExec: ").strip()
+            usuario = input("Usuario: ").strip()
+            password = input("Contraseña: ").strip()
+            dominio = input("Dominio (deja vacío si no aplica): ").strip()
+            escaneo_crackmapexec(target, usuario, password, dominio)
+        elif opcion == "59":
+            archivo = input("Ruta al archivo binario/firmware para analizar con Binwalk: ").strip()
+            output = input("Archivo de salida [por defecto: binwalk_result.txt]: ").strip() or "binwalk_result.txt"
+            escaneo_binwalk(archivo, output)
         else:
-            print("Opción no válida.")
+            print("Opción no válida.") 
