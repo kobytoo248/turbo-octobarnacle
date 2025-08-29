@@ -1,19 +1,28 @@
 import re
+import shutil
+from utilidades import herramienta_instalada, validar_objetivo, validar_dominio
 import subprocess
-import time
 import os
+from herramientas import (
+    escaneo_sherlock, escaneo_subfinder, escaneo_crackmapexec, escaneo_binwalk,
+    escaneo_basico, escaneo_servicios, escaneo_os, escaneo_servicios_C, escaneo_agresivo,
+    escaneo_syn, escaneo_sigiloso, escaneo_ipv6, escaneo_nse_personalizado, escaneo_arp,
+    escaneo_udp, escaneo_nse_vuln, mostrar_resumen_servicios, escaneo_nmap_msf,
+    ayuda_android, escaneo_dirsearch, escaneo_hydra, escaneo_gobuster, escaneo_nessus,
+    generar_payload_msfvenom, escaneo_nikto, escaneo_whatweb, escaneo_enum4linux,
+    escaneo_openvas, escaneo_wfuzz, escaneo_ffuf, validar_url_fuzz, escaneo_searchsploit,
+    escaneo_netcat, ejecutar_msfconsole, escaneo_john, escaneo_hashcat, escaneo_aircrack,
+    escaneo_amass, escaneo_sublist3r, escaneo_dnsenum, escaneo_theharvester,
+    escaneo_netdiscover, escaneo_nuclei, escaneo_cewl, escaneo_medusa, escaneo_rustscan,
+    escaneo_impacket_getnpusers, escaneo_wpscan, escaneo_joomscan, escaneo_xsser,
+    escaneo_reconng, escaneo_spiderfoot, escaneo_shodan, lanzar_maltego, escaneo_ghunt,
+    escaneo_social_analyzer, escaneo_censys, escaneo_exiftool, escaneo_sqlmap
+)
 
-def validar_objetivo(objetivo):
-    ip_regex = r"^\d{1,3}(\.\d{1,3}){3}$"
-    dominio_regex = r"^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-    ipv6_regex = r"^([0-9a-fA-F:]+)$"
-    if re.match(ip_regex, objetivo) or re.match(dominio_regex, objetivo) or re.match(ipv6_regex, objetivo):
-        return True
-    return False
-def validar_dominio(dominio):
-    dominio_regex = r"^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
-    return re.match(dominio_regex, dominio)
-
+# Deja aquí solo la función mostrar_ayuda, el menú y el bucle principal.
+# Elimina todas las funciones que ya moviste a los otros archivos.
+# Copia aquí TODAS las funciones de escaneo (por ejemplo, escaneo_sherlock, escaneo_subfinder, escaneo_binwalk, etc.)
+# No pongas el menú ni el bucle principal aquí.
 def ejecutar_comando(comando):
     global usar_proxychains
     if usar_proxychains:
@@ -536,13 +545,18 @@ def escaneo_sqlmap(url, output="sqlmap_result.txt", extra=""):
         except subprocess.CalledProcessError as e:
             print(f"Error al ejecutar sqlmap: {e}")
 def escaneo_sherlock(usuario, output="sherlock_result.txt"):
-    comando = ["/root/.local/bin/sherlock", usuario]  # Usa la ruta que te dio 'which sherlock'
-    with open(output, "w") as f:
-        try:
+    if not herramienta_instalada("sherlock"):
+        print("❌ Sherlock no está instalado o no se encuentra en el PATH.")
+        return
+    comando = ["/root/.local/bin/sherlock", usuario]
+    try:
+        with open(output, "w") as f:
             subprocess.run(comando, check=True, stdout=f)
-            print(f"Resultados guardados en: {output}")
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar Sherlock: {e}")
+        print(f"✅ Resultados guardados en: {output}")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error al ejecutar Sherlock: {e}")
+    except Exception as ex:
+        print(f"❌ Error inesperado: {ex}")
 def escaneo_subfinder(dominio, output="subfinder_result.txt"):
     comando = ["subfinder", "-d", dominio, "-o", output]
     try:
@@ -637,6 +651,7 @@ if __name__ == "__main__":
         opcion = input("Elige una opción (1-59, h para ayuda, q para salir): ")
         if opcion.lower() == "q":
             print("Saliendo...")
+            print("¡Gracias por usar el menú de automatización! Hasta pronto.")
             break
         extra = input("¿Quieres añadir parámetros extra a Nmap? (deja vacío si no): ")
         if extra.lower() in ["si", "no"]:
@@ -650,11 +665,12 @@ if __name__ == "__main__":
                 continue
 
         # Opciones que NO requieren objetivo (ejemplo: 56 Sherlock)
-        if opcion == "56":
-            usuario = input("Nombre de usuario para buscar en redes sociales con Sherlock: ").strip()
-            output = input("Archivo de salida [por defecto: sherlock_result.txt]: ").strip() or "sherlock_result.txt"
-            escaneo_sherlock(usuario, output)
-        # ...resto de opciones...
+        if os.path.isfile(output):
+            print("\n--- Resultado de Sherlock ---")
+            with open(output, "r") as f:
+                print(f.read())
+    else:
+        print(f"No se encontró el archivo de resultados: {output}")
         if opcion == "1":
             escaneo_basico(objetivo, min_rate=1000, extra=extra, puertos="", formato="txt")
             mostrar_resumen_servicios("nmap_result.txt")
@@ -896,10 +912,24 @@ if __name__ == "__main__":
             usuario = input("Nombre de usuario para buscar en redes sociales con Sherlock: ").strip()
             output = input("Archivo de salida [por defecto: sherlock_result.txt]: ").strip() or "sherlock_result.txt"
             escaneo_sherlock(usuario, output)
+            # Mostrar automáticamente el resultado
+            if os.path.isfile(output):
+                print("\n--- Resultado de Sherlock ---")
+                with open(output, "r") as f:
+                    print(f.read())
+            else:
+                print(f"No se encontró el archivo de resultados: {output}")
         elif opcion == "57":
             dominio = input("Dominio objetivo para enumerar subdominios con Subfinder: ").strip()
             output = input("Archivo de salida [por defecto: subfinder_result.txt]: ").strip() or "subfinder_result.txt"
             escaneo_subfinder(dominio, output)
+            # Mostrar automáticamente el resultado
+            if os.path.isfile(output):
+                print("\n--- Resultado de Subfinder ---")
+                with open(output, "r") as f:
+                    print(f.read())
+            else:
+                print(f"No se encontró el archivo de resultados: {output}")
         elif opcion == "58":
             target = input("IP o rango objetivo para CrackMapExec: ").strip()
             usuario = input("Usuario: ").strip()
@@ -910,5 +940,10 @@ if __name__ == "__main__":
             archivo = input("Ruta al archivo binario/firmware para analizar con Binwalk: ").strip()
             output = input("Archivo de salida [por defecto: binwalk_result.txt]: ").strip() or "binwalk_result.txt"
             escaneo_binwalk(archivo, output)
-        else:
-            print("Opción no válida.") 
+            # Mostrar automáticamente el resultado
+            if os.path.isfile(output):
+                print("\n--- Resultado de Binwalk ---")
+                with open(output, "r") as f:
+                    print(f.read())
+            else:
+                print(f"No se encontró el archivo de resultados: {output}") 
