@@ -1,34 +1,19 @@
 # Automatizaciones de Pentesting y OSINT
 
-Herramienta en Python para automatizar escaneos y tareas comunes de pentesting y OSINT usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat, Metasploit, John the Ripper, Hashcat, Aircrack-ng, amass, sublist3r, dnsenum, theHarvester, netdiscover, nuclei, cewl, medusa, rustscan, impacket, wpscan, joomscan, xsser, Recon-ng, SpiderFoot, Shodan, Maltego, GHunt, Social Analyzer, Censys, ExifTool y más.
+Herramienta en Python para automatizar escaneos y tareas comunes de pentesting y OSINT usando Nmap, Hydra, Gobuster, FFUF, Wfuzz, Searchsploit, Netcat, Metasploit, John the Ripper, Hashcat, Aircrack-ng, amass, sublist3r, dnsenum, theHarvester, netdiscover, nuclei, cewl, medusa, rustscan, impacket, wpscan, joomscan, xsser, Recon-ng, SpiderFoot, Shodan, Maltego, GHunt, Social Analyzer, Censys, ExifTool, sqlmap, Sherlock, Subfinder, CrackMapExec, Binwalk y más.
 
 ## Características
 
-- Escaneo de puertos y servicios con Nmap (varios modos y formatos)
-- Detección de vulnerabilidades con scripts NSE, Nikto y Nuclei
-- Fuerza bruta de contraseñas con Hydra y Medusa
-- Fuzzing de directorios y archivos con Gobuster, FFUF, Dirsearch y Wfuzz
-- Generación de payloads con msfvenom
-- Búsqueda de exploits locales con Searchsploit
-- Comandos útiles de Netcat
-- Automatización de Metasploit con archivos `.rc`
-- Cracking de hashes con John the Ripper y Hashcat
-- Cracking de WiFi WPA/WPA2 con Aircrack-ng
-- Enumeración de subdominios y DNS con amass, sublist3r y dnsenum
-- Recolección de correos y dominios con theHarvester
-- Descubrimiento de hosts en red local con netdiscover
-- Generador de diccionarios personalizados con cewl
-- Escaneo de vulnerabilidades en WordPress y Joomla con wpscan y joomscan
-- Detección de XSS con xsser
-- Automatización de Recon-ng, SpiderFoot, Shodan, Maltego, GHunt, Social Analyzer y Censys para OSINT
-- Extracción de metadatos con ExifTool (alternativa a FOCA)
-- Validación de rutas, dominios y archivos para evitar errores comunes
-- Menú interactivo en bucle para ejecutar varias opciones sin reiniciar el script
+- Menú interactivo con más de 59 opciones de pentesting y OSINT.
+- Validación de rutas, dominios y archivos para evitar errores comunes.
+- Automatización de escaneos, fuerza bruta, fuzzing, recolección OSINT y análisis de vulnerabilidades.
+- Integración de herramientas avanzadas para redes Windows/AD y análisis de binarios.
+- Resultados guardados automáticamente en archivos para cada herramienta.
 
 ## Requisitos
 
 - Python 3.x
-- Las herramientas externas instaladas en el sistema (`nmap`, `hydra`, `gobuster`, `ffuf`, `wfuzz`, `searchsploit`, `netcat`, `msfvenom`, `msfconsole`, `john`, `hashcat`, `aircrack-ng`, `amass`, `sublist3r`, `dnsenum`, `theHarvester`, `netdiscover`, `nuclei`, `cewl`, `medusa`, `rustscan`, `impacket-scripts`, `wpscan`, `joomscan`, `xsser`, `recon-ng`, `spiderfoot`, `shodan`, `maltego`, `GHunt`, `social-analyzer`, `censys`, `exiftool`, etc.)
+- Las herramientas externas instaladas en el sistema (`nmap`, `hydra`, `gobuster`, `ffuf`, `wfuzz`, `searchsploit`, `netcat`, `msfvenom`, `msfconsole`, `john`, `hashcat`, `aircrack-ng`, `amass`, `sublist3r`, `dnsenum`, `theHarvester`, `netdiscover`, `nuclei`, `cewl`, `medusa`, `rustscan`, `impacket-scripts`, `wpscan`, `joomscan`, `xsser`, `recon-ng`, `spiderfoot`, `shodan`, `maltego`, `GHunt`, `social-analyzer`, `censys`, `exiftool`, `sqlmap`, `sherlock`, `subfinder`, `crackmapexec`, `binwalk`, etc.)
 
 ## Uso
 
@@ -44,37 +29,30 @@ Para salir, escribe `q` en el menú.
 1. Escaneo básico de puertos
 2. Escaneo de servicios y versiones
 ...
-47. Automatización de Recon-ng (ejecutar scripts .rc en workspace)
-48. Recolección OSINT automatizada con SpiderFoot
-49. Búsqueda OSINT en dispositivos con Shodan
-50. Lanzar Maltego para investigaciones OSINT gráficas
-51. Recolección OSINT sobre cuentas Google con GHunt
-52. Búsqueda OSINT de perfiles en redes sociales con Social Analyzer
-53. Búsqueda OSINT en hosts con Censys
-54. Extracción de metadatos de archivos con ExifTool (alternativa a FOCA)
+55. Automatización de SQL Injection con sqlmap
+56. Búsqueda de usuarios en redes sociales con Sherlock
+57. Enumeración de subdominios con Subfinder
+58. Automatización de ataques SMB/AD con CrackMapExec
+59. Análisis de archivos binarios y firmware con Binwalk
 
 ## Ejemplo de uso
 
-- **John the Ripper:**  
-  Selecciona la opción 31 y proporciona el archivo de hashes y el diccionario.
-- **Hashcat:**  
-  Selecciona la opción 32, indica el archivo de hashes, el diccionario y el modo.
-- **Aircrack-ng:**  
-  Selecciona la opción 33, indica el archivo .cap y el diccionario.
-- **amass/sublist3r/dnsenum/theHarvester:**  
-  Ingresa un dominio válido (ejemplo.com) y sigue las instrucciones.
-- **wpscan/joomscan/xsser:**  
-  Ingresa la URL del sitio web objetivo.
-- **ExifTool:**  
-  Ingresa la ruta al archivo (imagen, PDF, DOC, etc.) para extraer metadatos.
+- **Sherlock:**  
+  Selecciona la opción 56 y proporciona el nombre de usuario a buscar.
+- **Subfinder:**  
+  Selecciona la opción 57 e ingresa el dominio objetivo.
+- **CrackMapExec:**  
+  Selecciona la opción 58 e ingresa IP/rango, usuario, contraseña y dominio.
+- **Binwalk:**  
+  Selecciona la opción 59 e ingresa la ruta al archivo binario/firmware.
 
 ## Notas
 
 - Para usar proxychains y Tor, selecciona la opción al inicio.
-- Los resultados de Searchsploit y otros escaneos se pueden guardar automáticamente en archivos de texto.
+- Los resultados de cada herramienta se guardan automáticamente en archivos de texto.
 - Revisa la ayuda integrada (`h`) para ver todas las opciones disponibles.
 - Puedes ejecutar varias opciones sin reiniciar el script.
-- La opción de Censys requiere un Personal Access Token (API Key).
+- Algunas herramientas requieren configuración adicional (API keys, tokens, etc.).
 
 ## Licencia
 
